@@ -323,6 +323,8 @@ ul { padding: 0; list-style: none; }
 .pdp-pix strong { font-size: 22px; }
 .pdp-pix span { margin-left: 6px; padding: 2px 8px; border-radius: 4px; background: #E6F4EC; font-size: 13px; font-weight: 700; }
 .pdp-parcelas { margin-top: 4px; font-size: 15px; }
+.pdp-cnpj { margin-top: 10px; font-size: 14px; }
+.pdp-cnpj a { color: var(--preto); font-weight: 700; text-decoration: underline; }
 .pdp-preco-nota { margin-top: 6px; font-size: 14px; }
 .economia { color: var(--verde); }
 .opcao { margin-top: 22px; }
