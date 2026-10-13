@@ -17,7 +17,7 @@ Protótipo navegável do e-commerce da Mais Mendes Distribuidora, usado para val
 - **Preços:** são reais os 3 da planilha do cliente, a tabela dos cabos Lamesa e a argamassa Precon (tirados das artes do cliente). Os demais são de exemplo.
 - **Descontos:** a tag e o preço "de" são de exemplo, só para mostrar o componente.
 - **Frete e prazo:** simulados — CEPs iniciados em 74/75 caem em Goiânia e região.
-- **Fotos de produto:** 15 são recortes das artes do próprio cliente; as outras vêm de bancos livres e mostram o tipo de produto, não a marca exata. Fontes em [CREDITOS.md](CREDITOS.md).
+- **Fotos de produto:** todas em fundo branco e sem marca d'água. 15 produtos usam a foto real, recortada das artes do próprio cliente; os outros usam imagens de licença livre que mostram o tipo de produto, não a marca exata. Fontes em [CREDITOS.md](CREDITOS.md).
 - **Textos e fotos dos banners.**
 
 ## Estrutura
