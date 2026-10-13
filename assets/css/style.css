@@ -39,6 +39,7 @@ ul { padding: 0; list-style: none; }
 
 .container { width: 100%; max-width: var(--container); margin: 0 auto; padding: 0 24px; }
 .ico { flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.ico-cheio { fill: currentColor; stroke: none; }
 
 /* ---------- Botões (manual: laranja, raio 25px, bold, 12x24) ---------- */
 .btn {
@@ -392,8 +393,8 @@ ul { padding: 0; list-style: none; }
 .barra.pulso { animation: pulso .4s ease; }
 @keyframes pulso { 50% { transform: translate(-50%, 0) scale(1.05); } }
 
-.zap { position: fixed; right: 20px; bottom: 20px; z-index: 45; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: #1FAF54; color: var(--branco); box-shadow: 0 6px 18px rgba(0,0,0,.25); }
-.zap:hover { background: #17963F; }
+.zap { position: fixed; right: 20px; bottom: 20px; z-index: 45; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: #25D366; color: var(--branco); box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+.zap:hover { background: #1EBE5A; }
 
 .aviso-flutuante { position: fixed; left: 50%; top: 20px; z-index: 90; transform: translate(-50%, -200%); max-width: min(92vw, 520px); padding: 14px 20px; background: var(--preto); color: var(--branco); border-left: 6px solid var(--laranja); border-radius: 6px; font-size: 15px; box-shadow: 0 10px 30px rgba(0,0,0,.3); transition: transform .3s ease; }
 .aviso-flutuante.visivel { transform: translate(-50%, 0); }
