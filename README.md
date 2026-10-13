@@ -3,6 +3,7 @@
 Protótipo navegável do e-commerce da Mais Mendes Distribuidora, usado para validar arquitetura e fluxo antes da implementação no tema **Ipanema** da Nuvemshop.
 
 **Ver online:** https://atende3ads-ux.github.io/mais-mendes-ecommerce-prototipo/
+**Mapa da loja (sitemap interativo):** https://atende3ads-ux.github.io/mais-mendes-ecommerce-prototipo/sitemap.html
 
 ## O que dá para testar
 
@@ -23,6 +24,7 @@ Protótipo navegável do e-commerce da Mais Mendes Distribuidora, usado para val
 
 ```
 index.html · categoria.html · produto.html
+sitemap.html           mapa da loja para validação, no padrão visual da 3ADS (arquivo único)
 assets/css/style.css   tokens do manual de marca + componentes
 assets/js/data.js      catálogo gerado da planilha de produtos do cliente
 assets/js/app.js       cabeçalho, rodapé, orçamento e páginas

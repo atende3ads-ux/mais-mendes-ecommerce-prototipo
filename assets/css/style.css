@@ -70,7 +70,7 @@ ul { padding: 0; list-style: none; }
 /* ---------- Aviso de protótipo ---------- */
 .aviso { background: #FFF4E2; color: var(--preto); font-size: 13px; border-bottom: 1px solid #F3DDB8; }
 .aviso .container { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 36px; }
-.aviso button { text-decoration: underline; font-weight: 700; }
+.aviso button, .aviso a { text-decoration: underline; font-weight: 700; }
 
 /* ---------- Cabeçalho ---------- */
 #cabecalho { display: contents; } /* para o cabeçalho fixo acompanhar a página inteira */

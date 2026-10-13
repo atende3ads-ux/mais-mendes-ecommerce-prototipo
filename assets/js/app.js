@@ -190,7 +190,7 @@
       </div>`).join('');
     return `
     <div class="aviso" id="aviso"><div class="container">
-      <span><strong>Protótipo de navegação.</strong> Preços, frete e prazos são ilustrativos.</span>
+      <span><strong>Protótipo de navegação.</strong> Preços, frete e prazos são ilustrativos. <a href="sitemap.html">Ver mapa da loja</a></span>
       <button data-acao="fechar-aviso">Entendi</button>
     </div></div>
     <div class="topo"><div class="container">
@@ -638,4 +638,13 @@
   if (pagina === 'categoria') paginaCategoria();
   if (pagina === 'produto') paginaProduto();
   atualizar();
+  // Link direto do mapa da loja (sitemap.html): abre o orçamento já com um exemplo, se estiver vazio
+  if (location.hash === '#orcamento') {
+    if (!orc.length) {
+      [['cabo-flexivel-450-750v-lamesa-rolo-100-m', 2], ['disjuntor-unipolar-din-3-ka-tramontina', 6], ['tomada-2p-t-10a-250v-linha-aria-tramontina', 10]]
+        .forEach(([slug, qtd]) => adicionar(slug, opcoesPadrao(produto(slug)), qtd));
+      avisar('Orçamento de exemplo carregado.');
+    }
+    abrir('gaveta-orc');
+  }
 })();
