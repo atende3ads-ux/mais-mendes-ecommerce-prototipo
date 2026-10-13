@@ -12,19 +12,69 @@
   <div id="cabecalho"></div>
 
   <main id="conteudo">
-    <!-- Banner principal: 1580x700 (desktop) e 820x1000 (mobile) -->
-    <section class="hero">
-      <div class="hero-foto" style="background-image:url('https://maismendesdistribuidora.com.br/wp-content/uploads/2025/01/clientes-ferragista-2.jpg')"></div>
-      <div class="hero-faixas" aria-hidden="true"></div>
-      <div class="container">
-        <span class="tag"><span>Elétrica · Hidráulica · Iluminação · Ferramentas</span></span>
-        <h1>Sua obra com preço, frete e prazo <em>na hora</em></h1>
-        <p>Monte seu orçamento em minutos, sem cadastro e sem esperar retorno.</p>
-        <div class="hero-botoes">
-          <a class="btn btn-primario" href="categoria.html">Ver produtos</a>
-          <a class="btn btn-linha-claro" href="#como-funciona">Como funciona</a>
-        </div>
+    <!-- Banner rotativo. Arte: 1580x790 (desktop) e 820x1100 (mobile) -->
+    <section class="hero" aria-roledescription="carrossel" aria-label="Destaques">
+      <div class="hero-trilho" id="hero-trilho">
+
+        <article class="slide" aria-roledescription="slide" aria-label="1 de 4">
+          <div class="slide-foto" style="background-image:url('assets/img/banners/hero-atendimento.jpg');background-position:78% 22%"></div>
+          <div class="hero-faixas" aria-hidden="true"></div>
+          <div class="container">
+            <span class="tag"><span>Elétrica · Hidráulica · Iluminação · Ferramentas</span></span>
+            <h1>Sua obra com preço, frete e prazo <em>na hora</em></h1>
+            <p>Monte seu orçamento em minutos, sem cadastro e sem esperar retorno.</p>
+            <div class="hero-botoes">
+              <a class="btn btn-primario" href="categoria.html">Ver produtos</a>
+              <a class="btn btn-linha-claro" href="#como-funciona">Como funciona</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="slide" aria-roledescription="slide" aria-label="2 de 4">
+          <div class="slide-foto" style="background-image:url('assets/img/banners/hero-cabos.jpg')"></div>
+          <div class="container">
+            <span class="tag"><span>Fios e cabos</span></span>
+            <h2>Cabos Lamesa a partir de <em>R$&nbsp;147</em></h2>
+            <p>Rolo de 100 m, de 1,5 a 10 mm². Qualidade que garante segurança em cada instalação.</p>
+            <div class="hero-botoes">
+              <a class="btn btn-primario" href="produto.html?p=cabo-flexivel-450-750v-lamesa-rolo-100-m">Escolher a bitola</a>
+              <a class="btn btn-linha-claro" href="categoria.html?c=material-eletrico">Ver material elétrico</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="slide" aria-roledescription="slide" aria-label="3 de 4">
+          <div class="slide-foto" style="background-image:url('assets/img/banners/hero-ferramentas.jpg');background-position:80% 50%"></div>
+          <div class="container">
+            <span class="tag"><span>Ofertas da semana</span></span>
+            <h2>Ferramentas com até <em>15%&nbsp;OFF</em></h2>
+            <p>Stanley, DeWalt e Wesco para quem vive de obra.</p>
+            <div class="hero-botoes">
+              <a class="btn btn-primario" href="categoria.html?c=ferramentas-eletricas-e-manuais">Ver ofertas</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="slide" aria-roledescription="slide" aria-label="4 de 4">
+          <div class="slide-foto" style="background-image:url('assets/img/banners/hero-profissionais.jpg');background-position:70% 40%"></div>
+          <div class="container">
+            <span class="tag"><span>Para empresas e profissionais</span></span>
+            <h2>Parceira CREA, com condições para <em>CNPJ</em></h2>
+            <p>Nota fiscal, preço por volume e atendimento técnico para construtoras, lojistas e indústrias.</p>
+            <div class="hero-botoes">
+              <a class="btn btn-primario" href="#" data-acao="zap">Falar com um consultor</a>
+            </div>
+          </div>
+        </article>
+
       </div>
+      <button class="hero-seta hero-ant" data-passo-hero="-1" aria-label="Banner anterior">
+        <svg class="ico" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>
+      </button>
+      <button class="hero-seta hero-prox" data-passo-hero="1" aria-label="Próximo banner">
+        <svg class="ico" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+      <div class="hero-pontos" id="hero-pontos"></div>
     </section>
 
     <!-- Banners de categoria -->

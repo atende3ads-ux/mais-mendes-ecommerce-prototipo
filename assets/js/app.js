@@ -5,9 +5,9 @@
   'use strict';
 
   const { categorias: CATS, produtos: PRODS } = window.MM_DATA;
-  const SITE = 'https://maismendesdistribuidora.com.br/wp-content/uploads/2025/01/';
-  const LOGO = SITE + 'maismendes-logo-versao-3.png';
-  const LOGO_CLARO = SITE + 'maismendes-white-logo-versao-3.png';
+  const IMG = 'assets/img/';
+  const LOGO = IMG + 'logo-mais-mendes.png';
+  const LOGO_CLARO = IMG + 'logo-mais-mendes-branco.png';
   const FONE = '4003-1960';
 
   const $ = (s, r = document) => r.querySelector(s);
@@ -64,7 +64,7 @@
   const urlCat = (c, sub) => `categoria.html?c=${c.slug}${sub ? '&s=' + encodeURIComponent(sub) : ''}`;
   const temEscolha = (p) => p.opcoes.some((o) => o.valores.length > 1);
   const opcoesPadrao = (p) => Object.fromEntries(p.opcoes.map((o) => [o.nome, o.valores[0]]));
-  const precoDe = (p, opts) => {
+  const precoAtual = (p, opts) => {
     if (p.precoVar && opts) {
       const v = Object.values(opts).find((x) => x in p.precoVar);
       if (v) return p.precoVar[v];
@@ -72,6 +72,9 @@
     return p.preco;
   };
   const precoMin = (p) => (p.precoVar ? Math.min(...Object.values(p.precoVar)) : p.preco);
+  const foto = (p, adiar = true) => `<img src="${IMG}produtos/${p.img}" alt="" width="800" height="800"${adiar ? ' loading="lazy"' : ''}>`;
+  const desconto = (p) => (p.precoDe ? Math.round((1 - p.preco / p.precoDe) * 100) : 0);
+  const tagDesconto = (p) => (desconto(p) ? `<span class="tag tag-desc"><span>-${desconto(p)}%</span></span>` : '');
 
   /* ---------- Estado (fica no navegador de quem está testando) ---------- */
   const guardar = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sem armazenamento */ } };
@@ -82,7 +85,7 @@
 
   const chave = (slug, opts) => slug + '|' + Object.values(opts).join('|');
   const qtdTotal = () => orc.reduce((s, i) => s + i.qtd, 0);
-  const subtotal = () => orc.reduce((s, i) => s + i.qtd * precoDe(produto(i.slug), i.opts), 0);
+  const subtotal = () => orc.reduce((s, i) => s + i.qtd * precoAtual(produto(i.slug), i.opts), 0);
 
   function adicionar(slug, opts, qtd = 1) {
     const k = chave(slug, opts);
@@ -154,10 +157,11 @@
   function card(p) {
     const preco = (temEscolha(p) && p.precoVar ? '<small>a partir de</small> ' : '') + brl(precoMin(p));
     return `<article class="card">
-      <a class="card-img" href="${urlProd(p)}" tabindex="-1" aria-hidden="true">${ico(p.icone, 96)}</a>
+      <a class="card-img" href="${urlProd(p)}" tabindex="-1" aria-hidden="true">${foto(p)}${tagDesconto(p)}</a>
       <div class="card-corpo">
         <span class="card-marca">${esc(p.marca)}</span>
         <a class="card-nome" href="${urlProd(p)}">${esc(p.nome)}</a>
+        <div class="card-de">${p.precoDe ? `<span class="sr-only">De </span><s>${brl(p.precoDe)}</s>` : ''}</div>
         <div class="card-preco">${preco}</div>
         <div class="card-acao" data-card="${p.slug}">${cardAcao(p)}</div>
       </div>
@@ -204,12 +208,12 @@
     <header class="cab">
       <div class="container cab-principal">
         <button class="btn-menu" data-acao="abrir-menu" aria-label="Abrir menu de categorias">${ico('menu', 26)}</button>
+        <a class="logo" href="index.html"><img src="${LOGO}" alt="Mais Mendes Distribuidora" data-logo></a>
         <form class="busca" action="categoria.html" role="search">
           <label class="sr-only" for="q">Buscar produto</label>
           <input id="q" name="q" type="search" placeholder="O que você procura? Ex.: cabo 2,5 mm" value="${esc(params.get('q') || '')}">
           <button aria-label="Buscar">${ico('search', 20)}</button>
         </form>
-        <a class="logo" href="index.html"><img src="${LOGO}" alt="Mais Mendes Distribuidora" data-logo></a>
         <div class="cab-acoes">
           <a class="cab-acao cab-conta" href="#">${ico('user')}<span><small>Entre ou cadastre-se</small><strong>Minha conta</strong></span></a>
           <button class="cab-acao cab-orc" data-acao="abrir-orc" aria-label="Abrir meu orçamento">
@@ -311,11 +315,11 @@
       const p = produto(i.slug);
       const variacao = Object.entries(i.opts).map(([n, v]) => `${n}: ${v}`).join(' · ');
       return `<div class="item">
-        <a class="item-img" href="${urlProd(p)}" tabindex="-1" aria-hidden="true">${ico(p.icone, 40)}</a>
+        <a class="item-img" href="${urlProd(p)}" tabindex="-1" aria-hidden="true">${foto(p)}</a>
         <div>
           <a class="item-nome" href="${urlProd(p)}">${esc(p.nome)}</a>
           ${variacao ? `<div class="item-var">${esc(variacao)}</div>` : ''}
-          <div class="item-linha">${seletor(i, 'qtd-p')}<strong>${brl(i.qtd * precoDe(p, i.opts))}</strong></div>
+          <div class="item-linha">${seletor(i, 'qtd-p')}<strong>${brl(i.qtd * precoAtual(p, i.opts))}</strong></div>
         </div>
       </div>`;
     }).join('') + `<div class="caixa"><h2>${ico('truck', 20)} Frete e prazo de entrega</h2>${blocoCep('orc')}</div>`;
@@ -337,7 +341,7 @@
     const linhas = orc.map((i) => {
       const p = produto(i.slug);
       const v = Object.values(i.opts).join(', ');
-      return `• ${i.qtd}x ${p.nome}${v ? ` (${v})` : ''} — ${brl(i.qtd * precoDe(p, i.opts))}`;
+      return `• ${i.qtd}x ${p.nome}${v ? ` (${v})` : ''} — ${brl(i.qtd * precoAtual(p, i.opts))}`;
     });
     return ['Olá! Quero fechar este orçamento:', '', ...linhas, '', `Subtotal: ${brl(subtotal())}`,
       f ? `Frete (${cepMascara(cep)}): ${precoFrete(f)} — ${f.nome}, ${f.prazo.toLowerCase()}` : 'Frete: a calcular',
@@ -387,8 +391,9 @@
   /* ---------- Páginas ---------- */
   function paginaHome() {
     const destaque = (slugs) => slugs.map(produto).filter(Boolean).map(card).join('');
+    const fotoCat = { 'material-eletrico': 'eletrica', 'material-hidraulico': 'hidraulica', iluminacao: 'iluminacao', 'ferramentas-eletricas-e-manuais': 'ferramentas' };
     $('#banners').innerHTML = CATS.slice(0, 4).map((c) => `<a class="banner" href="${urlCat(c)}">
-        ${ico(c.icone, 160, 'ico-g')}
+        <img src="${IMG}banners/categoria-${fotoCat[c.slug]}.jpg" alt="" width="900" height="675" loading="lazy">
         <strong>${c.nome}</strong><span>Ver ${plural(c.total, 'produto', 'produtos')} ${ico('right', 16)}</span>
       </a>`).join('');
     $('#mais-procurados').innerHTML = destaque([
@@ -405,10 +410,33 @@
       </a>`).join('');
     const marcas = [...new Set(PRODS.map((p) => p.marca))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
     $('#marcas').innerHTML = marcas.map((m) => `<a href="categoria.html?q=${encodeURIComponent(m)}">${esc(m)}</a>`).join('');
+    carrossel();
     $('#news').addEventListener('submit', (e) => {
       e.preventDefault();
       e.target.outerHTML = '<p class="news-ok">Pronto! Você vai receber nossas ofertas por e-mail.</p>';
     });
+  }
+
+  // Banner rotativo: rolagem horizontal com encaixe; troca sozinho a cada 6 s e pausa quando a pessoa interage
+  function carrossel() {
+    const trilho = $('#hero-trilho');
+    const slides = $$('.slide', trilho);
+    const pontos = $('#hero-pontos');
+    pontos.innerHTML = slides.map((_, i) => `<button data-ir="${i}" aria-label="Ir para o banner ${i + 1} de ${slides.length}"></button>`).join('');
+    const atual = () => Math.round(trilho.scrollLeft / trilho.clientWidth);
+    const ir = (i) => trilho.scrollTo({ left: ((i + slides.length) % slides.length) * trilho.clientWidth, behavior: 'smooth' });
+    const marcar = () => $$('button', pontos).forEach((b, i) => b.setAttribute('aria-current', i === atual()));
+    trilho.addEventListener('scroll', () => requestAnimationFrame(marcar), { passive: true });
+    $('.hero').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-ir], [data-passo-hero]');
+      if (!b) return;
+      ir(b.dataset.ir !== undefined ? Number(b.dataset.ir) : atual() + Number(b.dataset.passoHero));
+    });
+    let pausado = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    ['pointerenter', 'focusin', 'touchstart'].forEach((ev) => $('.hero').addEventListener(ev, () => { pausado = true; }, { passive: true }));
+    ['pointerleave', 'focusout'].forEach((ev) => $('.hero').addEventListener(ev, () => { pausado = window.matchMedia('(prefers-reduced-motion: reduce)').matches; }));
+    setInterval(() => { if (!pausado && !document.hidden) ir(atual() + 1); }, 6000);
+    marcar();
   }
 
   function paginaCategoria() {
@@ -499,15 +527,13 @@
       <nav class="trilha" aria-label="Você está em">${[`<a href="index.html">Início</a>`, `<a href="${urlCat(cat)}">${cat.nome}</a>`,
         p.sub ? `<a href="${urlCat(cat, p.sub)}">${p.sub}</a>` : '', `<span>${esc(p.nome)}</span>`].filter(Boolean).join(ico('right', 14))}</nav>
       <div class="pdp">
-        <div class="galeria">
-          <div class="miniaturas">${[0, 1, 2].map((n) => `<button aria-pressed="${n === 0}" aria-label="Foto ${n + 1}">${ico(p.icone, 40)}</button>`).join('')}</div>
-          <figure class="foto" style="margin:0">${ico(p.icone, 240)}<figcaption>Foto do produto · 1080 × 1080 px</figcaption></figure>
-        </div>
+        <figure class="foto" style="margin:0">${foto(p, false)}${tagDesconto(p)}</figure>
         <div>
           <span class="pdp-marca">${esc(p.marca)}</span>
           <h1>${esc(p.nome)}</h1>
-          <div class="pdp-preco" id="preco">${brl(precoDe(p, sel))}</div>
-          <p class="pdp-preco-nota">Preço por unidade</p>
+          ${p.precoDe ? `<div class="pdp-de"><span class="sr-only">De </span><s>${brl(p.precoDe)}</s></div>` : ''}
+          <div class="pdp-preco" id="preco">${brl(precoAtual(p, sel))}</div>
+          <p class="pdp-preco-nota">${p.precoDe ? `<strong class="economia">Você economiza ${brl(p.precoDe - p.preco)}</strong>` : 'Preço por unidade'}</p>
           ${p.opcoes.map((o, i) => `<fieldset class="opcao"><legend>${esc(o.nome)}</legend><div class="pilulas">
             ${o.valores.map((v, j) => `<label><input type="radio" name="op${i}" data-opcao="${esc(o.nome)}" value="${esc(v)}" ${j === 0 ? 'checked' : ''}><span>${esc(v)}</span></label>`).join('')}
           </div></fieldset>`).join('')}
@@ -539,13 +565,11 @@
     $('#conteudo').addEventListener('click', (e) => {
       const passo = e.target.closest('[data-passo]');
       if (passo) campo.value = Math.max(1, qtd() + Number(passo.dataset.passo));
-      const mini = e.target.closest('.miniaturas button');
-      if (mini) $$('.miniaturas button').forEach((b) => b.setAttribute('aria-pressed', b === mini));
     });
     $('#conteudo').addEventListener('change', (e) => {
       if (!e.target.dataset.opcao) return;
       sel[e.target.dataset.opcao] = e.target.value;
-      $('#preco').textContent = brl(precoDe(p, sel));
+      $('#preco').textContent = brl(precoAtual(p, sel));
     });
     $('#add-produto').addEventListener('click', () => {
       adicionar(p.slug, { ...sel }, qtd());
