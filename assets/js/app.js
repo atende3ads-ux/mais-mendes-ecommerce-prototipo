@@ -284,7 +284,8 @@
       </div>
       <div class="rodape-base">
         <div class="pagamentos">Pagamento: <span>Pix</span><span>Cartão</span><span>Boleto</span></div>
-        <div>© 2026 Mais Mendes Distribuidora · CNPJ 33.859.997/0001-99</div>
+        <div class="rodape-razao">© 2026 Mais Mendes Distribuidora · CNPJ 33.859.997/0001-99</div>
+        <div class="rodape-credito">Desenvolvido por <a href="https://3ads.com.br/" target="_blank" rel="noopener">3ADS</a></div>
       </div>
     </div>`;
   }
