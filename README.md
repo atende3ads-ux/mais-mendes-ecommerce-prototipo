@@ -16,6 +16,7 @@ Protótipo navegável do e-commerce da Mais Mendes Distribuidora, usado para val
 
 - **Preços:** são reais os 3 da planilha do cliente, a tabela dos cabos Lamesa e a argamassa Precon (tirados das artes do cliente). Os demais são de exemplo.
 - **Descontos:** a tag e o preço "de" são de exemplo, só para mostrar o componente.
+- **Preço no Pix e parcelas:** 5% no Pix e até 10x sem juros são valores de exemplo. A exibição segue o recurso nativo da Nuvemshop (um percentual único de desconto por meio de pagamento, mostrado na lista, no produto e no carrinho).
 - **Frete e prazo:** simulados — CEPs iniciados em 74/75 caem em Goiânia e região.
 - **Fotos de produto:** todas em fundo branco e sem marca d'água. 15 produtos usam a foto real, recortada das artes do próprio cliente; os outros usam imagens de licença livre que mostram o tipo de produto, não a marca exata. Fontes em [CREDITOS.md](CREDITOS.md).
 - **Textos e fotos dos banners.**

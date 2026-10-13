@@ -210,6 +210,8 @@ ul { padding: 0; list-style: none; }
 .card-de { min-height: 20px; font-size: 14px; line-height: 20px; color: var(--cinza-medio); }
 .card-preco { font-size: 22px; font-weight: 700; color: var(--preto); line-height: 1.1; }
 .card-preco small { font-size: 13px; font-weight: 400; color: var(--cinza); }
+.card-pix { margin-top: 4px; font-size: 14px; color: var(--verde); }
+.card-pix strong { font-size: 15px; }
 .card-acao { margin-top: auto; padding-top: 12px; }
 .card-acao .btn { width: 100%; }
 
@@ -314,6 +316,10 @@ ul { padding: 0; list-style: none; }
 .pdp h1 { margin: 6px 0 14px; font-size: clamp(24px, 2.6vw, 34px); line-height: 1.15; color: var(--preto); }
 .pdp-preco { font-size: 40px; font-weight: 700; line-height: 1; color: var(--preto); }
 .pdp-de { font-size: 18px; color: var(--cinza-medio); margin-bottom: 2px; }
+.pdp-pix { margin-top: 10px; font-size: 16px; color: var(--verde); }
+.pdp-pix strong { font-size: 22px; }
+.pdp-pix span { margin-left: 6px; padding: 2px 8px; border-radius: 4px; background: #E6F4EC; font-size: 13px; font-weight: 700; }
+.pdp-parcelas { margin-top: 4px; font-size: 15px; }
 .pdp-preco-nota { margin-top: 6px; font-size: 14px; }
 .economia { color: var(--verde); }
 .opcao { margin-top: 22px; }
@@ -383,6 +389,7 @@ ul { padding: 0; list-style: none; }
 .resumo div { display: flex; justify-content: space-between; gap: 12px; }
 .resumo .total { margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--borda); font-size: 20px; font-weight: 700; color: var(--preto); }
 .resumo .prazo { font-size: 14px; color: var(--verde); font-weight: 700; }
+.resumo .pix { font-size: 15px; font-weight: 700; color: var(--verde); }
 .gaveta-pe .btn + .btn { margin-top: 8px; }
 .orc-vazio { padding: 48px 12px; text-align: center; }
 .orc-vazio .ico { margin: 0 auto 16px; color: #C4C4C4; }

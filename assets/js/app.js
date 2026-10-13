@@ -74,6 +74,15 @@
     return p.preco;
   };
   const precoMin = (p) => (p.precoVar ? Math.min(...Object.values(p.precoVar)) : p.preco);
+  // Preço por meio de pagamento, como a Nuvemshop faz de forma nativa: um percentual único de desconto
+  // no Pix para a loja toda, exibido na lista, no produto e no carrinho. Valores de exemplo.
+  const DESCONTO_PIX = 0.05;
+  const PARCELAS_MAX = 10, PARCELA_MIN = 20;
+  const noPix = (v) => Math.round(v * (1 - DESCONTO_PIX) * 100) / 100;
+  const parcelas = (v) => {
+    const n = Math.min(PARCELAS_MAX, Math.floor(v / PARCELA_MIN));
+    return n >= 2 ? `ou ${n}x de ${brl(v / n)} sem juros no cartão` : 'ou à vista no cartão';
+  };
   const foto = (p, adiar = true) => `<img src="${IMG}produtos/${p.img}" alt="" width="800" height="800"${adiar ? ' loading="lazy"' : ''}>`;
   const desconto = (p) => (p.precoDe ? Math.round((1 - p.preco / p.precoDe) * 100) : 0);
   const tagDesconto = (p) => (desconto(p) ? `<span class="tag tag-desc"><span>-${desconto(p)}%</span></span>` : '');
@@ -165,12 +174,13 @@
         <a class="card-nome" href="${urlProd(p)}">${esc(p.nome)}</a>
         <div class="card-de">${p.precoDe ? `<span class="sr-only">De </span><s>${brl(p.precoDe)}</s>` : ''}</div>
         <div class="card-preco">${preco}</div>
+        <div class="card-pix"><strong>${brl(noPix(precoMin(p)))}</strong> com Pix</div>
         <div class="card-acao" data-card="${p.slug}">${cardAcao(p)}</div>
       </div>
     </article>`;
   }
   function cardAcao(p) {
-    if (temEscolha(p)) return `<a class="btn btn-linha btn-p" href="${urlProd(p)}">Escolher opção</a>`;
+    if (temEscolha(p)) return `<a class="btn btn-primario btn-p" href="${urlProd(p)}">Escolher opção</a>`;
     const item = orc.find((i) => i.slug === p.slug);
     if (!item) return `<button class="btn btn-primario btn-p" data-acao="add" data-slug="${p.slug}">Adicionar</button>`;
     return seletor(item, 'qtd-bloco qtd-p');
@@ -263,6 +273,8 @@
           <li><a href="#">Política de privacidade</a></li>
           <li><a href="#">Nossa história</a></li>
           <li><a href="#">Clube Mais Mendes</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Trabalhe conosco</a></li>
         </ul></div>
         <div><h3>Atendimento</h3><ul class="rodape-contato">
           <li>${ico('phone', 18)}<span>${FONE}</span></li>
@@ -333,6 +345,7 @@
         <div><span>Frete</span><span>${f ? precoFrete(f) : 'Informe o CEP'}</span></div>
         ${f ? `<div class="prazo"><span>${f.nome}</span><span>${f.prazo}</span></div>` : ''}
         <div class="total"><span>Total</span><span>${brl(sub + (f ? f.preco : 0))}</span></div>
+        <div class="pix"><span>Ou no Pix (${Math.round(DESCONTO_PIX * 100)}% de desconto)</span><span>${brl(noPix(sub) + (f ? f.preco : 0))}</span></div>
       </div>
       <button class="btn btn-primario btn-bloco" data-acao="finalizar">Finalizar compra</button>
       <button class="btn btn-linha btn-bloco" data-acao="enviar-zap">${ico('whatsapp', 20)} Enviar orçamento pelo WhatsApp</button>`;
@@ -347,7 +360,8 @@
     });
     return ['Olá! Quero fechar este orçamento:', '', ...linhas, '', `Subtotal: ${brl(subtotal())}`,
       f ? `Frete (${cepMascara(cep)}): ${precoFrete(f)} — ${f.nome}, ${f.prazo.toLowerCase()}` : 'Frete: a calcular',
-      `Total: ${brl(subtotal() + (f ? f.preco : 0))}`].join('\n');
+      `Total: ${brl(subtotal() + (f ? f.preco : 0))}`,
+      `No Pix: ${brl(noPix(subtotal()) + (f ? f.preco : 0))}`].join('\n');
   }
 
   function atualizar() {
@@ -535,6 +549,8 @@
           <h1>${esc(p.nome)}</h1>
           ${p.precoDe ? `<div class="pdp-de"><span class="sr-only">De </span><s>${brl(p.precoDe)}</s></div>` : ''}
           <div class="pdp-preco" id="preco">${brl(precoAtual(p, sel))}</div>
+          <p class="pdp-pix"><strong id="preco-pix">${brl(noPix(precoAtual(p, sel)))}</strong> com Pix <span>${Math.round(DESCONTO_PIX * 100)}% de desconto</span></p>
+          <p class="pdp-parcelas" id="preco-parcelas">${parcelas(precoAtual(p, sel))}</p>
           <p class="pdp-preco-nota">${p.precoDe ? `<strong class="economia">Você economiza ${brl(p.precoDe - p.preco)}</strong>` : 'Preço por unidade'}</p>
           ${p.opcoes.map((o, i) => `<fieldset class="opcao"><legend>${esc(o.nome)}</legend><div class="pilulas">
             ${o.valores.map((v, j) => `<label><input type="radio" name="op${i}" data-opcao="${esc(o.nome)}" value="${esc(v)}" ${j === 0 ? 'checked' : ''}><span>${esc(v)}</span></label>`).join('')}
@@ -572,6 +588,8 @@
       if (!e.target.dataset.opcao) return;
       sel[e.target.dataset.opcao] = e.target.value;
       $('#preco').textContent = brl(precoAtual(p, sel));
+      $('#preco-pix').textContent = brl(noPix(precoAtual(p, sel)));
+      $('#preco-parcelas').textContent = parcelas(precoAtual(p, sel));
     });
     $('#add-produto').addEventListener('click', () => {
       adicionar(p.slug, { ...sel }, qtd());
