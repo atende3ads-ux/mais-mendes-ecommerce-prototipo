@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Mais Mendes Distribuidora | Protótipo do e-commerce</title>
+  <meta name="description" content="Protótipo de navegação do e-commerce da Mais Mendes Distribuidora (tema Ipanema, Nuvemshop).">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-pagina="home">
+  <div id="cabecalho"></div>
+
+  <main id="conteudo">
+    <!-- Banner principal: 1580x700 (desktop) e 820x1000 (mobile) -->
+    <section class="hero">
+      <div class="hero-foto" style="background-image:url('https://maismendesdistribuidora.com.br/wp-content/uploads/2025/01/clientes-ferragista-2.jpg')"></div>
+      <div class="hero-faixas" aria-hidden="true"></div>
+      <div class="container">
+        <span class="tag"><span>Elétrica · Hidráulica · Iluminação · Ferramentas</span></span>
+        <h1>Sua obra com preço, frete e prazo <em>na hora</em></h1>
+        <p>Monte seu orçamento em minutos, sem cadastro e sem esperar retorno.</p>
+        <div class="hero-botoes">
+          <a class="btn btn-primario" href="categoria.html">Ver produtos</a>
+          <a class="btn btn-linha-claro" href="#como-funciona">Como funciona</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Banners de categoria -->
+    <section class="secao" aria-label="Principais categorias">
+      <div class="container">
+        <div class="banners" id="banners"></div>
+      </div>
+    </section>
+
+    <!-- Como funciona -->
+    <section class="secao secao-cinza" id="como-funciona">
+      <div class="container">
+        <div class="sec-cab">
+          <div>
+            <h2 class="sec-titulo">Orçamento pronto em 3 passos</h2>
+            <p class="sec-sub">Tão simples quanto pedir no balcão, só que sem fila.</p>
+          </div>
+        </div>
+        <div class="passos">
+          <div class="passo">
+            <div class="passo-n"><span>1</span></div>
+            <h3>Escolha os produtos</h3>
+            <p>Busque pelo nome ou navegue pelas categorias e toque em <strong>Adicionar</strong>.</p>
+          </div>
+          <div class="passo">
+            <div class="passo-n"><span>2</span></div>
+            <h3>Informe seu CEP</h3>
+            <p>O frete e o prazo de entrega aparecem na hora, antes de qualquer cadastro.</p>
+          </div>
+          <div class="passo">
+            <div class="passo-n"><span>3</span></div>
+            <h3>Confira o total e finalize</h3>
+            <p>Pague com Pix, cartão ou boleto — ou envie o orçamento para o nosso WhatsApp.</p>
+          </div>
+        </div>
+        <div class="passos-cta">
+          <a class="btn btn-escuro" href="categoria.html">Começar meu orçamento</a>
+          <p>O total acompanha você durante toda a navegação.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lista de produtos 1 -->
+    <section class="secao">
+      <div class="container">
+        <div class="sec-cab">
+          <h2 class="sec-titulo">Mais procurados</h2>
+          <a class="link-seta" href="categoria.html">Ver todos</a>
+        </div>
+        <div class="grade rolagem" id="mais-procurados"></div>
+      </div>
+    </section>
+
+    <!-- Faixa promocional -->
+    <section class="faixa">
+      <div class="container">
+        <div>
+          <small>Para empresas e grandes volumes</small>
+          <h2>Condições especiais para CNPJ</h2>
+          <p>Construtoras, lojistas e indústrias contam com preço por volume e fornecimento contínuo.</p>
+        </div>
+        <a class="btn btn-escuro" href="#" data-acao="zap">Falar com um consultor</a>
+      </div>
+    </section>
+
+    <!-- Categorias em destaque -->
+    <section class="secao secao-cinza">
+      <div class="container">
+        <div class="sec-cab"><h2 class="sec-titulo">Compre por categoria</h2></div>
+        <div class="cats" id="categorias"></div>
+      </div>
+    </section>
+
+    <!-- Lista de produtos 2 -->
+    <section class="secao">
+      <div class="container">
+        <div class="sec-cab">
+          <h2 class="sec-titulo">Ferramentas para quem vive de obra</h2>
+          <a class="link-seta" href="categoria.html?c=ferramentas-eletricas-e-manuais">Ver todas</a>
+        </div>
+        <div class="grade rolagem" id="ferramentas"></div>
+      </div>
+    </section>
+
+    <!-- Ícones com texto -->
+    <section class="secao secao-cinza" aria-label="Por que comprar na Mais Mendes">
+      <div class="container">
+        <div class="selos">
+          <div class="selo">
+            <svg class="ico" width="32" height="32" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.2 7.8 8 9 4.8-1.2 8-4.5 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/></svg>
+            <div><strong>Compra segura</strong><span>Pagamento protegido e nota fiscal em todos os pedidos.</span></div>
+          </div>
+          <div class="selo">
+            <svg class="ico" width="32" height="32" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11v10H3zM14 9h4l3 3v4h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="17.5" cy="18" r="2"/></svg>
+            <div><strong>Entrega ágil</strong><span>Até 24h em Goiânia e região e envio para todo o Brasil.</span></div>
+          </div>
+          <div class="selo">
+            <svg class="ico" width="32" height="32" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="2.5" y="13" width="4" height="6" rx="1.5"/><rect x="17.5" y="13" width="4" height="6" rx="1.5"/><path d="M19.5 19a4 4 0 0 1-4 3H13"/></svg>
+            <div><strong>Atendimento técnico</strong><span>Fale com quem entende de obra antes de comprar.</span></div>
+          </div>
+          <div class="selo">
+            <svg class="ico" width="32" height="32" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="6"/><path d="m8.5 14-1.5 7 5-3 5 3-1.5-7M9.5 9l1.8 1.8L14.8 7"/></svg>
+            <div><strong>Parceira CREA</strong><span>Selo de parceria e produtos com certificado de qualidade.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Marcas -->
+    <section class="secao">
+      <div class="container">
+        <div class="sec-cab"><h2 class="sec-titulo">Marcas que você encontra aqui</h2></div>
+        <div class="marcas" id="marcas"></div>
+      </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="secao secao-cinza news">
+      <div class="container">
+        <h2>Receba ofertas para a sua obra</h2>
+        <p>Promoções e novidades direto no seu e-mail.</p>
+        <form id="news">
+          <label class="sr-only" for="email">Seu e-mail</label>
+          <input id="email" type="email" placeholder="Seu e-mail" required>
+          <button class="btn btn-escuro">Quero receber</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape" id="rodape"></footer>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
