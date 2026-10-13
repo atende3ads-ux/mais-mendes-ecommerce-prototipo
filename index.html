@@ -6,6 +6,9 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Mais Mendes Distribuidora | Protótipo do e-commerce</title>
   <meta name="description" content="Protótipo de navegação do e-commerce da Mais Mendes Distribuidora (tema Ipanema, Nuvemshop).">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body data-pagina="home">
@@ -85,7 +88,7 @@
     </section>
 
     <!-- Como funciona -->
-    <section class="secao secao-cinza" id="como-funciona">
+    <section class="secao secao-m secao-cinza" id="como-funciona">
       <div class="container">
         <div class="sec-cab">
           <div>
@@ -95,19 +98,19 @@
         </div>
         <div class="passos">
           <div class="passo">
-            <div class="passo-n"><span>1</span></div>
+            <div class="passo-n">01</div>
             <h3>Escolha os produtos</h3>
             <p>Busque pelo nome ou navegue pelas categorias e toque em <strong>Adicionar</strong>.</p>
           </div>
           <div class="passo">
-            <div class="passo-n"><span>2</span></div>
+            <div class="passo-n">02</div>
             <h3>Informe seu CEP</h3>
             <p>O frete e o prazo de entrega aparecem na hora, antes de qualquer cadastro.</p>
           </div>
           <div class="passo">
-            <div class="passo-n"><span>3</span></div>
+            <div class="passo-n">03</div>
             <h3>Confira o total e finalize</h3>
-            <p>Pague com Pix, cartão ou boleto — ou envie o orçamento para o nosso WhatsApp.</p>
+            <p>Pague com Pix, cartão ou boleto, ou envie o orçamento para o nosso WhatsApp.</p>
           </div>
         </div>
         <div class="passos-cta">
@@ -118,7 +121,7 @@
     </section>
 
     <!-- Lista de produtos 1 -->
-    <section class="secao">
+    <section class="secao secao-gg">
       <div class="container">
         <div class="sec-cab">
           <h2 class="sec-titulo">Mais procurados</h2>
@@ -128,20 +131,20 @@
       </div>
     </section>
 
-    <!-- Faixa promocional -->
-    <section class="faixa">
+    <!-- Card para CNPJ: fica metade sobre a seção de categorias -->
+    <section class="faixa-area" aria-label="Condições para empresas">
       <div class="container">
-        <div>
+        <div class="faixa">
           <small>Para empresas e grandes volumes</small>
           <h2>Condições especiais para CNPJ</h2>
           <p>Construtoras, lojistas e indústrias contam com preço por volume e fornecimento contínuo.</p>
+          <a class="btn btn-primario" href="#" data-acao="zap">Falar com um consultor</a>
         </div>
-        <a class="btn btn-escuro" href="#" data-acao="zap">Falar com um consultor</a>
       </div>
     </section>
 
     <!-- Categorias em destaque -->
-    <section class="secao secao-cinza">
+    <section class="secao secao-cinza secao-sob-faixa">
       <div class="container">
         <div class="sec-cab"><h2 class="sec-titulo">Compre por categoria</h2></div>
         <div class="cats" id="categorias"></div>
@@ -149,7 +152,7 @@
     </section>
 
     <!-- Lista de produtos 2 -->
-    <section class="secao">
+    <section class="secao secao-g">
       <div class="container">
         <div class="sec-cab">
           <h2 class="sec-titulo">Ferramentas para quem vive de obra</h2>
@@ -192,14 +195,14 @@
     </section>
 
     <!-- Newsletter -->
-    <section class="secao secao-cinza news">
+    <section class="secao news">
       <div class="container">
         <h2>Receba ofertas para a sua obra</h2>
         <p>Promoções e novidades direto no seu e-mail.</p>
         <form id="news">
           <label class="sr-only" for="email">Seu e-mail</label>
           <input id="email" type="email" placeholder="Seu e-mail" required>
-          <button class="btn btn-escuro">Quero receber</button>
+          <button class="btn btn-primario">Quero receber</button>
         </form>
       </div>
     </section>
