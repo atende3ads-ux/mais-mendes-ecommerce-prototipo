@@ -252,10 +252,26 @@ ul { padding: 0; list-style: none; }
 .selo strong { display: block; color: var(--preto); font-size: 16px; }
 .selo span { font-size: 14px; }
 
-/* ---------- Marcas ---------- */
-.marcas { display: flex; flex-wrap: wrap; gap: 10px; }
-.marcas a { padding: 9px 18px; border: 1px solid var(--borda); border-radius: var(--raio-btn); font-size: 14px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--cinza); }
-.marcas a:hover { border-color: var(--preto); color: var(--preto); }
+/* ---------- Marcas parceiras (faixa contínua de logos) ---------- */
+.marcas-secao { padding-bottom: 0; }
+.marcas-secao + .secao-gg { padding-top: 96px; }
+.marcas { display: flex; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent); }
+.marcas-faixa { display: flex; flex: none; align-items: center; gap: 16px; padding-right: 16px; animation: marcas 60s linear infinite; }
+.marcas:hover .marcas-faixa, .marcas:focus-within .marcas-faixa { animation-play-state: paused; }
+@keyframes marcas { to { transform: translateX(-100%); } }
+.marcas a { display: grid; place-items: center; min-width: 150px; height: 88px; padding: 0 28px; border: 1px solid var(--borda); border-radius: var(--raio); background: var(--branco); transition: border-color .15s; }
+.marcas a:hover { border-color: var(--preto); }
+.marcas img { width: auto; height: var(--h, 40px); max-width: none; }
+.marca-txt { font-size: 15px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--cinza); text-align: center; line-height: 1.1; }
+
+/* ---------- Preço por perfil (CNPJ e CREA-GO) ---------- */
+.selo-tabela { display: inline-block; margin-left: 4px; padding: 0 6px; border-radius: 3px; background: var(--preto); color: var(--laranja); font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; line-height: 18px; vertical-align: 1px; }
+.pdp-tabela { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 10px; padding: 4px 10px; border-radius: 4px; background: var(--preto); color: var(--laranja); font-size: 13px; font-weight: 700; }
+.pdp-cashback { margin-top: 6px; font-size: 14px; font-weight: 700; color: var(--preto); }
+.pdp-perfil { display: flex; align-items: flex-start; gap: 10px; margin-top: 16px; padding: 12px 14px; border-radius: var(--raio); background: var(--cinza-claro); font-size: 14px; color: var(--preto); }
+.pdp-perfil .ico { color: var(--laranja-escuro); }
+.pdp-perfil a { font-weight: 700; text-decoration: underline; }
+.cab-perfil { color: var(--laranja-escuro) !important; font-weight: 700; }
 
 /* ---------- Newsletter ---------- */
 .news { text-align: center; background: linear-gradient(180deg, var(--preto) 0%, #101010 100%); color: var(--branco); }
@@ -358,6 +374,12 @@ ul { padding: 0; list-style: none; }
 .frete b { color: var(--preto); font-size: 16px; white-space: nowrap; }
 .frete b.gratis { color: var(--verde); }
 .fretes-ler .frete { cursor: default; grid-template-columns: 1fr auto; }
+.frete-nota { margin-top: 10px; font-size: 13px; line-height: 1.45; }
+.frete-gratis { margin-top: 16px; padding: 12px 14px; border-radius: var(--raio); background: #FFF8EC; border: 1px solid #F6D8A8; font-size: 14px; color: var(--preto); }
+.frete-gratis.ok { display: flex; align-items: center; gap: 8px; background: #E6F4EC; border-color: #BFE3CE; color: var(--verde); }
+.frete-gratis.ok strong { color: var(--verde); }
+.frete-progresso { height: 8px; margin-top: 8px; border-radius: 4px; background: #F1E3CB; overflow: hidden; }
+.frete-progresso span { display: block; height: 100%; background: var(--laranja); border-radius: 4px; transition: width .3s ease; }
 .descricao { margin-top: 32px; }
 .descricao h2 { font-size: 20px; color: var(--preto); text-transform: uppercase; margin-bottom: 10px; }
 .descricao p { margin-bottom: 14px; }
@@ -395,6 +417,39 @@ ul { padding: 0; list-style: none; }
 .resumo .total { margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--borda); font-size: 20px; font-weight: 700; color: var(--preto); }
 .resumo .prazo { font-size: 14px; color: var(--verde); font-weight: 700; }
 .resumo .pix { font-size: 15px; font-weight: 700; color: var(--verde); }
+.resumo .desconto { color: var(--verde); font-weight: 700; }
+.resumo .cashback { font-size: 14px; color: var(--preto); }
+.resumo-perfil { margin: -4px 0 12px; font-size: 14px; }
+.resumo-perfil a { font-weight: 700; color: var(--preto); text-decoration: underline; }
+
+/* ---------- Minha conta e cadastro profissional ---------- */
+.conta-inicio h3, .conta-form h3, .conta-ok h3 { margin-top: 20px; font-size: 18px; color: var(--preto); }
+.conta-nota { margin: 6px 0 14px; font-size: 13px; color: var(--cinza); }
+.perfil-op { position: relative; display: block; width: 100%; margin-bottom: 10px; padding: 14px 16px; border: 1.5px solid var(--borda); border-radius: var(--raio); text-align: left; }
+.perfil-op:hover { border-color: var(--preto); }
+.perfil-op[aria-current="true"] { border-color: var(--preto); background: #FFF8EC; }
+.perfil-op strong { display: block; color: var(--preto); font-size: 16px; }
+.perfil-op span { display: block; font-size: 14px; }
+.perfil-op em { position: absolute; right: 14px; top: 14px; display: inline-flex; align-items: center; gap: 4px; font-style: normal; font-size: 13px; font-weight: 700; color: var(--verde); }
+.conta-cadastro { margin-top: 24px; padding: 18px; border-radius: var(--raio); background: var(--cinza-claro); }
+.conta-cadastro strong { display: block; color: var(--preto); }
+.conta-cadastro p { margin: 4px 0 14px; font-size: 14px; }
+.beneficio { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; padding: 12px 14px; border-radius: var(--raio); background: var(--preto); color: #E6E6E6; font-size: 14px; }
+.beneficio .ico { color: var(--laranja); }
+.beneficio strong { color: var(--branco); }
+.conta-form > p { margin-top: 4px; font-size: 14px; }
+.conta-form .opcao { margin-top: 16px; }
+.campo { display: block; margin-top: 14px; }
+.campo span { display: block; margin-bottom: 6px; font-size: 14px; font-weight: 700; color: var(--preto); }
+.campo input { width: 100%; height: 46px; padding: 0 16px; border: 1.5px solid #CFCFCF; border-radius: var(--raio-btn); font-size: 16px; background: var(--branco); }
+.campo input:focus { border-color: var(--preto); outline: none; }
+.campo small { display: block; margin-top: 6px; font-size: 13px; }
+.conta-form .btn-primario { margin-top: 20px; }
+.conta-form .btn + .btn, .conta-ok .btn + .btn { margin-top: 8px; }
+.conta-ok { padding-top: 12px; text-align: center; }
+.conta-ok > .ico { margin: 16px auto 0; color: var(--verde); }
+.conta-ok p { margin: 8px 0 20px; }
+.conta-ok .conta-nota { margin-top: 16px; }
 .gaveta-pe .btn + .btn { margin-top: 8px; }
 .orc-vazio { padding: 48px 12px; text-align: center; }
 .orc-vazio .ico { margin: 0 auto 16px; color: #C4C4C4; }
@@ -482,6 +537,10 @@ ul { padding: 0; list-style: none; }
   .cat-ico { width: 44px; height: 44px; }
   .cat strong { font-size: 15px; }
   .selos { gap: 20px 16px; }
+  .marcas-secao + .secao-gg { padding-top: 56px; }
+  .marcas-faixa { gap: 10px; padding-right: 10px; animation-duration: 45s; }
+  .marcas a { min-width: 118px; height: 72px; padding: 0 18px; }
+  .marcas img { height: calc(var(--h, 40px) * .8); }
   .selo { flex-direction: column; gap: 8px; }
   .news form { flex-direction: column; }
   .news input { flex: none; }
@@ -513,4 +572,7 @@ ul { padding: 0; list-style: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  /* sem movimento, a faixa de marcas vira uma lista com rolagem lateral */
+  .marcas { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+  .marcas-faixa[aria-hidden="true"] { display: none; }
 }

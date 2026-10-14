@@ -51,6 +51,33 @@ Obras derivadas (fundo removido e reenquadradas); seguem a mesma licença do ori
 
 Os originais estão em `https://commons.wikimedia.org/wiki/File:<nome do arquivo>`.
 
+## Logos das marcas parceiras (`assets/img/marcas/`)
+
+Marcas registradas dos respectivos fabricantes, usadas só para mostrar as marcas vendidas na loja. Fundo removido, recortadas e reduzidas a 96 px de altura. A Luxpremium fica de fora até haver um logo oficial.
+
+| Arquivo | Fonte |
+|---|---|
+| `blumenau.png` | blumenauiluminacao.com.br (logotipo.svg) |
+| `decoralita.png` | logo da loja oficial da DVG Decoralita (cabeçalho do site) |
+| `dewalt.png` | Wikimedia Commons, DeWalt_Logo.svg (PD-textlogo) |
+| `docol.png` | docol.com.br (logo do rodapé) |
+| `duropvc.png` | duropvc.com.br |
+| `elitek.png` | elitek.com.br (logo 2025) |
+| `icasa.png` | icasa.com.br (logotipo em PDF, 2025) |
+| `krona.png` | Wikimedia Commons, Krona_Tubos_e_Conexões.png (CC BY-SA 4.0) |
+| `lamesa.png` | lamesa.com.br (catálogo completo em PDF, p. 2) |
+| `luconi.png` | luconi.com.br |
+| `lumanti.png` | lumanti.com.br |
+| `onix.png` | onixbrasil.ind.br (manual de marca em PDF, p. 7) |
+| `pevesul.png` | pevesul.com.br |
+| `pluzie.png` | pluzie.com.br (SVG do cabeçalho) |
+| `precon.png` | precon.com.br (logo DVG Precon) |
+| `sibratec.png` | sibratec.ind.br (SVG do cabeçalho) |
+| `stanley.png` | Wikimedia Commons, Stanley_Hand_Tools_logo.svg (PD-textlogo) |
+| `tramontina.png` | Wikimedia Commons, Logotipo_da_Tramontina_(2025).svg (PD-textlogo) |
+| `viapol.png` | viapol.com.br |
+| `wesco.png` | wesco-tools.com |
+
 ## Sketchfab (via Openverse)
 
 Imagens de modelos 3D de Yaiyeondurising, licença CC BY-SA 4.0, com o fundo removido.

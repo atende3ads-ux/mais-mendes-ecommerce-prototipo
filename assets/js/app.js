@@ -74,12 +74,29 @@
     return p.preco;
   };
   const precoMin = (p) => (p.precoVar ? Math.min(...Object.values(p.precoVar)) : p.preco);
-  // Segundo preço: "com Pix ou no CNPJ". Na Nuvemshop são dois recursos nativos — desconto por meio de
-  // pagamento (percentual único para a loja) e tabela de preços de atacado (para clientes cadastrados e
-  // logados). A linha única só vale se os dois usarem o mesmo percentual. Valores de exemplo.
+  const centavos = (v) => Math.round(v * 100) / 100;
+  // Desconto no Pix: na Nuvemshop é um percentual único por meio de pagamento, para a loja toda. 5% é exemplo.
   const DESCONTO_PIX = 0.05;
   const PARCELAS_MAX = 10, PARCELA_MIN = 20;
-  const noPix = (v) => Math.round(v * (1 - DESCONTO_PIX) * 100) / 100;
+  const noPix = (v) => centavos(v * (1 - DESCONTO_PIX));
+
+  /* ---------- Preço por perfil ----------
+     O preço de vitrine é o do cliente CPF. CNPJ e CREA-GO são tabelas de preço da Nuvemshop ("Varejo e Atacado"):
+     o cliente se cadastra pelo link da tabela, a equipe aprova e o preço aparece depois do login.
+     CREA-GO: regra publicada na LP do cliente (5% de desconto + 3% de cashback, fiação fora).
+     CNPJ: 10% é exemplo. Duas tabelas pedem o plano Escala (ver PLANO-ECOMMERCE.md, item 15). */
+  const PERFIS = {
+    cnpj: { nome: 'Empresa (CNPJ)', curto: 'CNPJ', desconto: 0.10, cashback: 0, fora: [],
+      resumo: 'Tabela de atacado: 10% de desconto (exemplo)' },
+    crea: { nome: 'Profissional CREA-GO', curto: 'CREA-GO', desconto: 0.05, cashback: 0.03, fora: ['Cabo Elétrico'],
+      resumo: '5% de desconto + 3% de cashback · fiação elétrica fora' },
+  };
+  const tabela = () => PERFIS[perfil] || null;
+  const pct = (v) => `${Math.round(v * 100)}%`;
+  const comTabela = (p) => !!tabela() && !tabela().fora.includes(p.sub);
+  const foraDaTabela = (p) => !!tabela() && tabela().fora.includes(p.sub);
+  const precoCliente = (p, opts) => (comTabela(p) ? centavos(precoAtual(p, opts) * (1 - tabela().desconto)) : precoAtual(p, opts));
+  const precoMinCliente = (p) => (comTabela(p) ? centavos(precoMin(p) * (1 - tabela().desconto)) : precoMin(p));
   const parcelas = (v) => {
     const n = Math.min(PARCELAS_MAX, Math.floor(v / PARCELA_MIN));
     return n >= 2 ? `ou ${n}x de ${brl(v / n)} sem juros no cartão` : 'ou à vista no cartão';
@@ -94,10 +111,16 @@
   let orc = ler('mm_orcamento', []).filter((i) => produto(i.slug));
   let cep = ler('mm_cep', '');
   let freteId = ler('mm_frete', '');
+  let perfil = ler('mm_perfil', ''); // '' = visitante ou cliente CPF; 'cnpj' e 'crea' simulam o login aprovado
+  if (!PERFIS[perfil]) perfil = '';
 
   const chave = (slug, opts) => slug + '|' + Object.values(opts).join('|');
   const qtdTotal = () => orc.reduce((s, i) => s + i.qtd, 0);
-  const subtotal = () => orc.reduce((s, i) => s + i.qtd * precoAtual(produto(i.slug), i.opts), 0);
+  const somar = (fn) => centavos(orc.reduce((s, i) => s + i.qtd * fn(produto(i.slug), i.opts), 0));
+  const subtotalVitrine = () => somar(precoAtual);
+  const subtotal = () => somar(precoCliente);
+  // cashback do CREA-GO: 3% sobre os itens do benefício (fiação fora), para usar na próxima compra
+  const cashback = () => (tabela() && tabela().cashback ? centavos(somar((p, o) => (comTabela(p) ? precoCliente(p, o) : 0)) * tabela().cashback) : 0);
 
   function adicionar(slug, opts, qtd = 1) {
     const k = chave(slug, opts);
@@ -120,29 +143,61 @@
     }
   }
 
-  /* ---------- Frete (simulação: no site real vem da Nuvemshop / transportadora) ---------- */
+  /* ---------- Frete (simulação da Política de Frete do cliente, 13/10/2026) ----------
+     Grande Goiânia, frota própria, em até 24h após a aprovação do pagamento: grátis a partir de R$ 200 (CPF e CREA-GO)
+     ou R$ 1.000 (CNPJ, com taxa fixa entre R$ 200 e R$ 999,99). Abaixo de R$ 200, só retirada na loja, que é grátis
+     para todos. Fora da região: transportadora (Nuvem Envio, valores de exemplo); argamassas e barras de tubo,
+     só frete a combinar. Faixas de CEP, cidades atendidas e a taxa de R$ 25 ainda dependem do cliente. */
   const cepMascara = (v) => v.replace(/\D/g, '').slice(0, 8).replace(/^(\d{5})(\d)/, '$1-$2');
-  function fretes(c) {
+  const MINIMO_ENTREGA = 200, TAXA_CNPJ = 25;
+  const limiteGratis = () => (perfil === 'cnpj' ? 1000 : 200);
+  const grandeGoiania = (c) => { // Goiânia e Aparecida (74), Senador Canedo e Trindade
+    const n = Number(c.slice(0, 5));
+    return (n >= 74000 && n <= 74999) || (n >= 75250 && n <= 75264) || (n >= 75380 && n <= 75394);
+  };
+  const pesado = (p) => p.sub === 'Tubos' || p.cat === 'Argamassas';
+  const RETIRADA = { id: 'retirada', nome: 'Retirar na loja · Setor Capuava', preco: 0, prazo: 'Avisamos quando o pedido estiver separado' };
+
+  // valor: produtos do orçamento, sem o frete. Na página do produto (valor nulo) a regra aparece por extenso.
+  function fretes(c, valor, itens) {
+    if (grandeGoiania(c)) {
+      const lim = limiteGratis();
+      const entrega = { id: 'entrega', nome: 'Entrega Mais Mendes', prazo: 'Em até 24h após a aprovação do pagamento' };
+      const regiao = 'Goiânia e região';
+      if (valor == null) {
+        return { regiao, opcoes: [{ ...entrega, rotulo: `Grátis acima de ${brl(lim)}` }, RETIRADA],
+          nota: perfil === 'cnpj'
+            ? `Entrega a partir de ${brl(MINIMO_ENTREGA)} em produtos: taxa fixa de ${brl(TAXA_CNPJ)} até ${brl(lim)}. Abaixo disso, retirada na loja.`
+            : `Para compras abaixo de ${brl(MINIMO_ENTREGA)}, retirada na loja.` };
+      }
+      if (valor >= lim) return { regiao, opcoes: [{ ...entrega, preco: 0 }, RETIRADA] };
+      if (valor >= MINIMO_ENTREGA) return { regiao, opcoes: [{ ...entrega, preco: TAXA_CNPJ }, RETIRADA] };
+      return { regiao, opcoes: [RETIRADA],
+        nota: `A entrega começa em ${brl(MINIMO_ENTREGA)} em produtos. Até lá, a retirada na loja é grátis.` };
+    }
     const uf = Number(c.slice(0, 2));
-    if (uf === 74 || uf === 75) return { regiao: 'Goiânia e região', opcoes: [
-      { id: 'entrega', nome: 'Entrega Mais Mendes', preco: 19.9, prazo: 'Receba em até 24 horas' },
-      { id: 'retirada', nome: 'Retirar na loja · Setor Capuava', preco: 0, prazo: 'Pronto em até 2 horas' },
-    ] };
-    if (uf === 72 || uf === 73 || uf === 76) return { regiao: 'Goiás e Distrito Federal', opcoes: [
-      { id: 'transp', nome: 'Transportadora', preco: 49.9, prazo: 'Receba em 2 a 4 dias úteis' },
-    ] };
-    return { regiao: 'Demais estados', opcoes: [
-      { id: 'transp', nome: 'Transportadora', preco: 89.9, prazo: 'Receba em 5 a 9 dias úteis' },
-    ] };
+    const goias = uf >= 72 && uf <= 76;
+    const regiao = goias ? 'Goiás e Distrito Federal' : 'Demais estados';
+    const pesados = (itens || []).filter(pesado);
+    if (pesados.length) {
+      return { regiao, opcoes: [{ id: 'combinar', nome: 'Frete a combinar', preco: null, rotulo: 'A combinar', prazo: 'Nosso time cota o frete pelo WhatsApp' }, RETIRADA],
+        nota: `Argamassas e barras de tubo são entregues só em Goiânia e região. Para a sua cidade, cotamos o frete de: ${pesados.map((p) => p.nome).join('; ')}.` };
+    }
+    const transp = goias
+      ? { id: 'transp', nome: 'Transportadora', preco: 49.9, prazo: 'Postagem em até 2 dias úteis + 2 a 4 dias úteis' }
+      : { id: 'transp', nome: 'Transportadora', preco: 89.9, prazo: 'Postagem em até 2 dias úteis + 5 a 9 dias úteis' };
+    return { regiao, opcoes: [transp, RETIRADA] };
   }
+  const itensOrc = () => orc.map((i) => produto(i.slug));
   const freteEscolhido = () => {
-    if (!cep) return null;
-    const { opcoes } = fretes(cep);
+    if (!cep || !orc.length) return null;
+    const { opcoes } = fretes(cep, subtotal(), itensOrc());
     return opcoes.find((o) => o.id === freteId) || opcoes[0];
   };
-  const precoFrete = (o) => (o.preco ? brl(o.preco) : 'Grátis');
+  const precoFrete = (o) => o.rotulo || (o.preco ? brl(o.preco) : 'Grátis');
+  const valorFrete = (f) => (f && f.preco ? f.preco : 0);
 
-  function blocoCep(contexto) {
+  function blocoCep(contexto, prod) {
     const editavel = contexto === 'orc';
     if (!cep) {
       return `<form class="cep" data-cep novalidate>
@@ -152,30 +207,44 @@
         </form>
         <p class="cep-erro" hidden>Digite um CEP com 8 números.</p>`;
     }
-    const { regiao, opcoes } = fretes(cep);
+    const { regiao, opcoes, nota } = editavel ? fretes(cep, subtotal(), itensOrc()) : fretes(cep, null, prod ? [prod] : []);
     const sel = freteEscolhido();
     const linhas = opcoes.map((o) => `
       <label class="frete">
-        ${editavel ? `<input type="radio" name="frete" value="${o.id}" ${o.id === sel.id ? 'checked' : ''}>` : ''}
+        ${editavel ? `<input type="radio" name="frete" value="${o.id}" ${sel && o.id === sel.id ? 'checked' : ''}>` : ''}
         <span><strong>${o.nome}</strong><small>${ico('clock', 14)} ${o.prazo}</small></span>
-        <b class="${o.preco ? '' : 'gratis'}">${precoFrete(o)}</b>
+        <b class="${o.preco === 0 ? 'gratis' : ''}">${precoFrete(o)}</b>
       </label>`).join('');
     return `<p class="cep-regiao">Entrega para <strong>${cepMascara(cep)}</strong> · ${regiao}
         <button class="link-seta" data-acao="trocar-cep" style="margin-left:8px;font-size:13px">Trocar</button></p>
-      <div class="fretes ${editavel ? '' : 'fretes-ler'}">${linhas}</div>`;
+      <div class="fretes ${editavel ? '' : 'fretes-ler'}">${linhas}</div>
+      ${nota ? `<p class="frete-nota">${nota}</p>` : ''}`;
+  }
+
+  // Barra "faltam R$ X para o frete grátis" (só faz sentido na Grande Goiânia ou antes de informar o CEP)
+  function barraFreteGratis() {
+    if (cep && !grandeGoiania(cep)) return '';
+    const lim = limiteGratis(), sub = subtotal();
+    if (sub >= lim) return `<div class="frete-gratis ok">${ico('check', 18)}<p><strong>Entrega grátis</strong> em Goiânia e região garantida.</p></div>`;
+    return `<div class="frete-gratis">
+        <p>Faltam <strong>${brl(lim - sub)}</strong> para a <strong>entrega grátis</strong> em Goiânia e região</p>
+        <div class="frete-progresso" role="progressbar" aria-label="Caminho até o frete grátis" aria-valuemin="0" aria-valuemax="${lim}" aria-valuenow="${Math.round(sub)}"><span style="width:${Math.min(100, (sub / lim) * 100).toFixed(1)}%"></span></div>
+      </div>`;
   }
 
   /* ---------- Componentes ---------- */
   function card(p) {
-    const preco = (temEscolha(p) && p.precoVar ? '<small>a partir de</small> ' : '') + brl(precoMin(p));
+    const meu = precoMinCliente(p);
+    const preco = (temEscolha(p) && p.precoVar ? '<small>a partir de</small> ' : '') + brl(meu);
+    const de = comTabela(p) ? precoMin(p) : p.precoDe;
     return `<article class="card">
       <a class="card-img" href="${urlProd(p)}" tabindex="-1" aria-hidden="true">${foto(p)}${tagDesconto(p)}</a>
       <div class="card-corpo">
         <span class="card-marca">${esc(p.marca)}</span>
         <a class="card-nome" href="${urlProd(p)}">${esc(p.nome)}</a>
-        <div class="card-de">${p.precoDe ? `<span class="sr-only">De </span><s>${brl(p.precoDe)}</s>` : ''}</div>
+        <div class="card-de">${de ? `<span class="sr-only">De </span><s>${brl(de)}</s>` : ''}${comTabela(p) ? ` <span class="selo-tabela">Preço ${tabela().curto}</span>` : ''}</div>
         <div class="card-preco">${preco}</div>
-        <div class="card-pix"><strong>${brl(noPix(precoMin(p)))}</strong> com Pix ou no CNPJ</div>
+        <div class="card-pix"><strong>${brl(noPix(meu))}</strong> no Pix</div>
         <div class="card-acao" data-card="${p.slug}">${cardAcao(p)}</div>
       </div>
     </article>`;
@@ -209,7 +278,8 @@
     <div class="topo"><div class="container">
       <ul>
         <li><a href="#">Clube Mais Mendes</a></li>
-        <li><a href="#">Venda para empresas (CNPJ)</a></li>
+        <li><a href="#" data-acao="cadastro" data-tipo="cnpj">Venda para empresas (CNPJ)</a></li>
+        <li><a href="#" data-acao="cadastro" data-tipo="crea">Profissionais CREA-GO</a></li>
         <li><a href="#">Nossa história</a></li>
       </ul>
       <ul>
@@ -228,7 +298,9 @@
           <button aria-label="Buscar">${ico('search', 20)}</button>
         </form>
         <div class="cab-acoes">
-          <a class="cab-acao cab-conta" href="#">${ico('user')}<span><small>Entre ou cadastre-se</small><strong>Minha conta</strong></span></a>
+          <button class="cab-acao cab-conta" data-acao="conta">${ico('user')}<span>${tabela()
+            ? `<small class="cab-perfil">Preço ${tabela().curto} ativo</small><strong>Minha conta</strong>`
+            : '<small>Entre ou cadastre-se</small><strong>Minha conta</strong>'}</span></button>
           <button class="cab-acao cab-orc" data-acao="abrir-orc" aria-label="Abrir meu orçamento">
             <span class="ico-wrap">${ico('cart')}<span class="contador" data-contador hidden>0</span></span>
             <span class="txt"><small>Meu orçamento</small><strong data-total>R$ 0,00</strong></span>
@@ -248,9 +320,9 @@
     </header>
     <div class="info"><div class="container"><ul>
       <li>${ico('truck', 20)} Entrega em até 24h em Goiânia e região</li>
+      <li>${ico('check', 20)} Frete grátis acima de R$ 200 na Grande Goiânia</li>
       <li>${ico('pin', 20)} Enviamos para todo o Brasil</li>
-      <li>${ico('card', 20)} Pix, cartão e boleto</li>
-      <li>${ico('building', 20)} Condições especiais para CNPJ</li>
+      <li>${ico('building', 20)} Preço especial para CNPJ e CREA-GO</li>
     </ul></div></div>`;
   }
 
@@ -274,6 +346,8 @@
           <li><a href="#">Política de privacidade</a></li>
           <li><a href="#">Nossa história</a></li>
           <li><a href="#">Clube Mais Mendes</a></li>
+          <li><a href="#" data-acao="cadastro" data-tipo="cnpj">Venda para empresas (CNPJ)</a></li>
+          <li><a href="#" data-acao="cadastro" data-tipo="crea">Profissionais CREA-GO</a></li>
           <li><a href="#">Blog</a></li>
           <li><a href="#">Trabalhe conosco</a></li>
         </ul></div>
@@ -299,11 +373,15 @@
       <div class="gaveta-corpo" id="orc-corpo"></div>
       <div class="gaveta-pe" id="orc-pe"></div>
     </aside>
+    <aside class="gaveta" id="gaveta-conta" role="dialog" aria-modal="true" aria-labelledby="conta-titulo" hidden>
+      <div class="gaveta-cab"><h2 id="conta-titulo">Minha conta</h2><button data-acao="fechar" aria-label="Fechar">${ico('x')}</button></div>
+      <div class="gaveta-corpo" id="conta-corpo"></div>
+    </aside>
     <aside class="gaveta gaveta-esq" id="gaveta-menu" role="dialog" aria-modal="true" aria-label="Categorias" hidden>
       <div class="gaveta-cab"><h2>Categorias</h2><button data-acao="fechar" aria-label="Fechar">${ico('x')}</button></div>
       <div class="gaveta-corpo">
         ${CATS.map((c) => `<div class="menu-cat"><a href="${urlCat(c)}">${ico(c.icone, 22)} ${c.nome}</a></div>`).join('')}
-        <div class="menu-apoio"><a href="#">Minha conta</a><a href="#">Ajuda</a><a href="#">Nossa loja</a><a href="#">Clube Mais Mendes</a></div>
+        <div class="menu-apoio"><a href="#" data-acao="conta">Minha conta</a><a href="#" data-acao="cadastro" data-tipo="cnpj">Venda para empresas (CNPJ)</a><a href="#" data-acao="cadastro" data-tipo="crea">Profissionais CREA-GO</a><a href="#">Ajuda</a><a href="#">Nossa loja</a><a href="#">Clube Mais Mendes</a></div>
       </div>
     </aside>
     <div class="barra" id="barra" role="status">
@@ -327,7 +405,7 @@
       return;
     }
     pe.hidden = false;
-    corpo.innerHTML = orc.map((i) => {
+    corpo.innerHTML = barraFreteGratis() + orc.map((i) => {
       const p = produto(i.slug);
       const variacao = Object.entries(i.opts).map(([n, v]) => `${n}: ${v}`).join(' · ');
       return `<div class="item">
@@ -335,35 +413,109 @@
         <div>
           <a class="item-nome" href="${urlProd(p)}">${esc(p.nome)}</a>
           ${variacao ? `<div class="item-var">${esc(variacao)}</div>` : ''}
-          <div class="item-linha">${seletor(i, 'qtd-p')}<strong>${brl(i.qtd * precoAtual(p, i.opts))}</strong></div>
+          ${foraDaTabela(p) ? `<div class="item-var">Fora do benefício ${tabela().curto}</div>` : ''}
+          <div class="item-linha">${seletor(i, 'qtd-p')}<strong>${brl(i.qtd * precoCliente(p, i.opts))}</strong></div>
         </div>
       </div>`;
     }).join('') + `<div class="caixa"><h2>${ico('truck', 20)} Frete e prazo de entrega</h2>${blocoCep('orc')}</div>`;
 
     const f = freteEscolhido();
-    const sub = subtotal();
+    const sub = subtotal(), vitrine = subtotalVitrine(), t = tabela(), cb = cashback();
     pe.innerHTML = `<div class="resumo">
-        <div><span>Subtotal (${plural(qtdTotal(), 'item', 'itens')})</span><span>${brl(sub)}</span></div>
+        <div><span>Subtotal (${plural(qtdTotal(), 'item', 'itens')})</span><span>${brl(vitrine)}</span></div>
+        ${t && vitrine > sub ? `<div class="desconto"><span>Desconto ${t.curto} (${pct(t.desconto)})</span><span>−${brl(vitrine - sub)}</span></div>` : ''}
         <div><span>Frete</span><span>${f ? precoFrete(f) : 'Informe o CEP'}</span></div>
         ${f ? `<div class="prazo"><span>${f.nome}</span><span>${f.prazo}</span></div>` : ''}
-        <div class="total"><span>Total</span><span>${brl(sub + (f ? f.preco : 0))}</span></div>
-        <div class="pix"><span>No Pix ou no CNPJ (${Math.round(DESCONTO_PIX * 100)}% de desconto)</span><span>${brl(noPix(sub) + (f ? f.preco : 0))}</span></div>
+        <div class="total"><span>Total</span><span>${brl(sub + valorFrete(f))}</span></div>
+        <div class="pix"><span>No Pix (${pct(DESCONTO_PIX)} de desconto)</span><span>${brl(noPix(sub) + valorFrete(f))}</span></div>
+        ${cb ? `<div class="cashback"><span>Cashback CREA-GO (${pct(t.cashback)}) para a próxima compra</span><span>${brl(cb)}</span></div>` : ''}
       </div>
+      ${t ? '' : `<p class="resumo-perfil">Tem CNPJ ou registro no CREA-GO? <a href="#" data-acao="conta">Entre e veja o seu preço</a></p>`}
       <button class="btn btn-primario btn-bloco" data-acao="finalizar">Finalizar compra</button>
       <button class="btn btn-linha btn-bloco" data-acao="enviar-zap">${ico('whatsapp', 20)} Enviar orçamento pelo WhatsApp</button>`;
   }
 
   function textoOrcamento() {
     const f = freteEscolhido();
+    const t = tabela();
     const linhas = orc.map((i) => {
       const p = produto(i.slug);
       const v = Object.values(i.opts).join(', ');
-      return `• ${i.qtd}x ${p.nome}${v ? ` (${v})` : ''} — ${brl(i.qtd * precoAtual(p, i.opts))}`;
+      return `• ${i.qtd}x ${p.nome}${v ? ` (${v})` : ''} — ${brl(i.qtd * precoCliente(p, i.opts))}`;
     });
-    return ['Olá! Quero fechar este orçamento:', '', ...linhas, '', `Subtotal: ${brl(subtotal())}`,
+    return ['Olá! Quero fechar este orçamento:', ...(t ? [`(Cliente ${t.nome})`] : []), '', ...linhas, '', `Subtotal: ${brl(subtotal())}`,
       f ? `Frete (${cepMascara(cep)}): ${precoFrete(f)} — ${f.nome}, ${f.prazo.toLowerCase()}` : 'Frete: a calcular',
-      `Total: ${brl(subtotal() + (f ? f.preco : 0))}`,
-      `No Pix ou no CNPJ: ${brl(noPix(subtotal()) + (f ? f.preco : 0))}`].join('\n');
+      `Total: ${brl(subtotal() + valorFrete(f))}`,
+      `No Pix: ${brl(noPix(subtotal()) + valorFrete(f))}`].join('\n');
+  }
+
+  /* ---------- Minha conta e cadastro profissional (simulação) ----------
+     No site real: login e cadastro padrão da Nuvemshop, e um link de autocadastro por tabela de preço, com
+     aprovação manual (a equipe confere o CNPJ ou o registro no CREA-GO). Nada do que se digita aqui é guardado. */
+  let telaConta = 'inicio', tipoCadastro = 'cnpj';
+  function desenharConta() {
+    const corpo = $('#conta-corpo');
+    const t = tabela();
+    if (telaConta === 'cadastro') {
+      const crea = tipoCadastro === 'crea';
+      corpo.innerHTML = `<form class="conta-form" data-cadastro>
+          <h3>Cadastro de empresa ou profissional</h3>
+          <p>Depois da aprovação, o seu preço aparece sempre que você entrar na loja.</p>
+          <fieldset class="opcao"><legend>Você é</legend><div class="pilulas">
+            <label><input type="radio" name="tipo" value="cnpj" ${crea ? '' : 'checked'}><span>Empresa (CNPJ)</span></label>
+            <label><input type="radio" name="tipo" value="crea" ${crea ? 'checked' : ''}><span>Profissional CREA-GO</span></label>
+          </div></fieldset>
+          <div class="beneficio">${ico('badge', 22)}<p>${crea
+            ? '<strong>5% de desconto + 3% de cashback</strong> em compras de qualquer valor. O cashback vale na próxima compra, por 30 dias. Fiação elétrica fica fora do benefício.'
+            : '<strong>Preço de atacado</strong> em todo o catálogo, com nota fiscal para a sua empresa. O percentual é definido pela Mais Mendes.'}</p></div>
+          <label class="campo"><span>${crea ? 'Nome completo' : 'Razão social'}</span><input name="nome" required autocomplete="${crea ? 'name' : 'organization'}"></label>
+          <label class="campo"><span>E-mail</span><input name="email" type="email" required autocomplete="email"></label>
+          <label class="campo"><span>WhatsApp</span><input name="fone" type="tel" required inputmode="tel" autocomplete="tel"></label>
+          ${crea
+            ? '<label class="campo"><span>Nº do registro no CREA-GO</span><input name="doc" required inputmode="numeric"><small>Está na sua carteira profissional. Também vale o CNPJ vinculado ao Conselho.</small></label>'
+            : '<label class="campo"><span>CNPJ</span><input name="doc" required inputmode="numeric"></label>'}
+          <button class="btn btn-primario btn-bloco">Enviar cadastro</button>
+          <button type="button" class="btn btn-linha btn-bloco" data-acao="conta-voltar">Voltar</button>
+        </form>`;
+      return;
+    }
+    if (telaConta === 'enviado') {
+      corpo.innerHTML = `<div class="conta-ok">${ico('check', 40)}
+          <h3>Cadastro enviado!</h3>
+          <p>Nossa equipe confere os dados e avisa por e-mail quando o seu preço ${PERFIS[tipoCadastro].curto} estiver liberado. Enquanto isso, você pode comprar pelo preço de vitrine.</p>
+          <button class="btn btn-primario btn-bloco" data-acao="perfil" data-perfil="${tipoCadastro}">Simular a aprovação</button>
+          <button class="btn btn-linha btn-bloco" data-acao="fechar">Continuar comprando</button>
+          <p class="conta-nota">Protótipo: no site real, a aprovação é feita pela equipe no painel da Nuvemshop.</p>
+        </div>`;
+      return;
+    }
+    const opcao = (id, titulo, desc) => `<button class="perfil-op" data-acao="perfil" data-perfil="${id}" ${perfil === id ? 'aria-current="true"' : ''}>
+        <strong>${titulo}</strong><span>${desc}</span>${perfil === id ? `<em>${ico('check', 16)} Ativo</em>` : ''}</button>`;
+    corpo.innerHTML = `<div class="conta-inicio">
+        ${t ? `<div class="beneficio">${ico('badge', 22)}<p>Você entrou como <strong>${t.nome}</strong>. ${t.resumo}.</p></div>` : ''}
+        <h3>Ver os preços como</h3>
+        <p class="conta-nota">Protótipo: no site real, aqui ficam o login e o cadastro da Nuvemshop. Escolha um perfil para simular o cliente já aprovado.</p>
+        ${opcao('', 'Visitante ou pessoa física (CPF)', 'Preço de vitrine')}
+        ${opcao('cnpj', 'Empresa (CNPJ)', PERFIS.cnpj.resumo)}
+        ${opcao('crea', 'Profissional CREA-GO', PERFIS.crea.resumo)}
+        <div class="conta-cadastro">
+          <strong>Tem CNPJ ou registro no CREA-GO?</strong>
+          <p>Cadastre-se uma vez e compre sempre com o seu preço.</p>
+          <button class="btn btn-escuro btn-bloco" data-acao="cadastro" data-tipo="cnpj">Cadastrar empresa ou profissional</button>
+        </div>
+      </div>`;
+  }
+  function abrirConta(tela, tipo) {
+    telaConta = tela;
+    if (tipo) tipoCadastro = tipo;
+    desenharConta();
+    if (!$('#gaveta-conta').classList.contains('aberto')) abrir('gaveta-conta');
+    else $('#gaveta-conta .gaveta-cab button').focus();
+  }
+  function trocarPerfil(novo) {
+    guardar('mm_perfil', novo);
+    try { sessionStorage.setItem('mm_aviso_perfil', novo || 'vitrine'); } catch (e) { /* ok */ }
+    location.reload(); // preços, cabeçalho e frete são redesenhados com o novo perfil
   }
 
   function atualizar() {
@@ -375,7 +527,7 @@
     $('#barra').classList.toggle('visivel', n > 0 && !aberta);
     document.body.classList.toggle('com-barra', n > 0);
     $$('[data-card]').forEach((e) => { e.innerHTML = cardAcao(produto(e.dataset.card)); });
-    $$('[data-frete-produto]').forEach((e) => { e.innerHTML = blocoCep('produto'); });
+    $$('[data-frete-produto]').forEach((e) => { e.innerHTML = blocoCep('produto', produto(e.dataset.freteProduto)); });
     desenharOrcamento();
   }
 
@@ -407,6 +559,15 @@
   }
 
   /* ---------- Páginas ---------- */
+  // Marcas do catálogo inicial, das mais presentes na loja para as demais, com a largura do logo (os PNGs têm 96 px
+  // de altura). A Luxpremium fica de fora até haver um logo oficial (ver CREDITOS.md).
+  const MARCAS = [['Tramontina', 640], ['Krona', 476], ['Lamesa', 278], ['Stanley', 197], ['DeWalt', 312], ['Docol', 476],
+    ['Viapol', 193], ['Precon', 790], ['Icasa', 416], ['Blumenau', 410], ['Pluzie', 260], ['Wesco', 425], ['Sibratec', 554],
+    ['Lumanti', 495], ['Luconi', 329], ['DuroPVC', 264], ['Decoralita', 966], ['Elitek', 496], ['Pevesul', 296], ['Ônix', 221]];
+  const slugMarca = (m) => norm(m).replace(/[^a-z0-9]/g, '');
+  // logos com a mesma área visual: os largos ficam mais baixos, os compactos chegam a 46 px de altura
+  const alturaLogo = (largura) => Math.round(Math.min(46, Math.sqrt(4800 / (largura / 96))));
+
   function paginaHome() {
     const destaque = (slugs) => slugs.map(produto).filter(Boolean).map(card).join('');
     const fotoCat = { 'material-eletrico': 'eletrica', 'material-hidraulico': 'hidraulica', iluminacao: 'iluminacao', 'ferramentas-eletricas-e-manuais': 'ferramentas' };
@@ -426,8 +587,13 @@
         <span class="cat-ico">${ico(c.icone, 26)}</span>
         <span><strong>${c.nome}</strong><small>${c.subs.length ? c.subs.join(' · ') : 'AC-I · AC-II · AC-III'}</small></span>
       </a>`).join('');
-    const marcas = [...new Set(PRODS.map((p) => p.marca))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
-    $('#marcas').innerHTML = marcas.map((m) => `<a href="categoria.html?q=${encodeURIComponent(m)}">${esc(m)}</a>`).join('');
+    // Marcas parceiras: logos em faixa contínua; a segunda cópia só existe para o laço não ter emenda
+    const logos = MARCAS.map(([m, largura]) => {
+      const h = alturaLogo(largura);
+      return `<li><a href="categoria.html?q=${encodeURIComponent(m)}" title="Ver produtos ${esc(m)}">
+        <img src="${IMG}marcas/${slugMarca(m)}.png" alt="${esc(m)}" width="${Math.round((largura / 96) * h)}" height="${h}" style="--h:${h}px" data-marca></a></li>`;
+    }).join('');
+    $('#marcas').innerHTML = `<ul class="marcas-faixa">${logos}</ul><ul class="marcas-faixa" aria-hidden="true">${logos.replace(/<a /g, '<a tabindex="-1" ')}</ul>`;
     carrossel();
     $('#news').addEventListener('submit', (e) => {
       e.preventDefault();
@@ -532,6 +698,25 @@
     listar();
   }
 
+  // Bloco de preço da página do produto: vitrine para quem não entrou; preço da tabela para CNPJ e CREA-GO aprovados
+  function precosPdp(p, sel) {
+    const t = tabela(), vitrine = precoAtual(p, sel), meu = precoCliente(p, sel);
+    const de = comTabela(p) ? vitrine : p.precoDe;
+    const nota = comTabela(p)
+      ? `<strong class="economia">Você economiza ${brl(vitrine - meu)} com o preço ${t.curto}</strong>`
+      : p.precoDe ? `<strong class="economia">Você economiza ${brl(p.precoDe - vitrine)}</strong>` : 'Preço por unidade';
+    return `
+      ${comTabela(p) ? `<p class="pdp-tabela">${ico('badge', 16)} Seu preço ${t.curto} · ${pct(t.desconto)} de desconto</p>` : ''}
+      ${de ? `<div class="pdp-de"><span class="sr-only">De </span><s>${brl(de)}</s></div>` : ''}
+      <div class="pdp-preco">${brl(meu)}</div>
+      <p class="pdp-pix"><strong>${brl(noPix(meu))}</strong> no Pix <span>${pct(DESCONTO_PIX)} de desconto</span></p>
+      <p class="pdp-parcelas">${parcelas(meu)}</p>
+      ${comTabela(p) && t.cashback ? `<p class="pdp-cashback">+ ${brl(centavos(meu * t.cashback))} de cashback (${pct(t.cashback)}) para a próxima compra</p>` : ''}
+      <p class="pdp-preco-nota">${nota}</p>
+      ${foraDaTabela(p) ? `<p class="pdp-perfil">${ico('badge', 20)}<span>Fiação elétrica não entra no benefício ${t.curto}. Este produto segue com o preço de vitrine.</span></p>` : ''}
+      ${t ? '' : `<p class="pdp-perfil">${ico('badge', 20)}<span>Tem CNPJ ou registro no CREA-GO? <a href="#" data-acao="conta">Entre e veja o seu preço</a></span></p>`}`;
+  }
+
   function paginaProduto() {
     const p = produto(params.get('p')) || PRODS[0];
     const cat = CATS.find((c) => c.nome === p.cat);
@@ -549,12 +734,7 @@
         <div>
           <span class="pdp-marca">${esc(p.marca)}</span>
           <h1>${esc(p.nome)}</h1>
-          ${p.precoDe ? `<div class="pdp-de"><span class="sr-only">De </span><s>${brl(p.precoDe)}</s></div>` : ''}
-          <div class="pdp-preco" id="preco">${brl(precoAtual(p, sel))}</div>
-          <p class="pdp-pix"><strong id="preco-pix">${brl(noPix(precoAtual(p, sel)))}</strong> com Pix ou no CNPJ <span>${Math.round(DESCONTO_PIX * 100)}% de desconto</span></p>
-          <p class="pdp-parcelas" id="preco-parcelas">${parcelas(precoAtual(p, sel))}</p>
-          <p class="pdp-cnpj">Tem CNPJ? <a href="#" data-acao="cnpj">Cadastre sua empresa</a> e compre por esse preço em qualquer forma de pagamento.</p>
-          <p class="pdp-preco-nota">${p.precoDe ? `<strong class="economia">Você economiza ${brl(p.precoDe - p.preco)}</strong>` : 'Preço por unidade'}</p>
+          <div id="pdp-precos">${precosPdp(p, sel)}</div>
           ${p.opcoes.map((o, i) => `<fieldset class="opcao"><legend>${esc(o.nome)}</legend><div class="pilulas">
             ${o.valores.map((v, j) => `<label><input type="radio" name="op${i}" data-opcao="${esc(o.nome)}" value="${esc(v)}" ${j === 0 ? 'checked' : ''}><span>${esc(v)}</span></label>`).join('')}
           </div></fieldset>`).join('')}
@@ -567,7 +747,7 @@
             <button class="btn btn-primario" id="add-produto">Adicionar ao orçamento</button>
           </div>
           <p class="disponivel">${ico('check', 18)} Disponível para entrega e retirada</p>
-          <div class="caixa"><h2>${ico('truck', 20)} Calcule frete e prazo</h2><div data-frete-produto></div></div>
+          <div class="caixa"><h2>${ico('truck', 20)} Calcule frete e prazo</h2><div data-frete-produto="${p.slug}"></div></div>
           <div class="descricao"><h2>Descrição</h2>${p.descricao}</div>
           <div class="garantias">
             <div class="selo">${ico('shield', 28)}<div><strong>Compra segura</strong><span>Seus dados protegidos do início ao fim.</span></div></div>
@@ -590,9 +770,7 @@
     $('#conteudo').addEventListener('change', (e) => {
       if (!e.target.dataset.opcao) return;
       sel[e.target.dataset.opcao] = e.target.value;
-      $('#preco').textContent = brl(precoAtual(p, sel));
-      $('#preco-pix').textContent = brl(noPix(precoAtual(p, sel)));
-      $('#preco-parcelas').textContent = parcelas(precoAtual(p, sel));
+      $('#pdp-precos').innerHTML = precosPdp(p, sel);
     });
     $('#add-produto').addEventListener('click', () => {
       adicionar(p.slug, { ...sel }, qtd());
@@ -622,7 +800,10 @@
     else if (acao === 'fechar-aviso') { $('#aviso').remove(); try { sessionStorage.setItem('mm_aviso', '1'); } catch (err) { /* ok */ } }
     else if (acao === 'finalizar') avisar('No site real, aqui você segue para o pagamento (checkout da Nuvemshop).');
     else if (acao === 'enviar-zap') window.open('https://wa.me/?text=' + encodeURIComponent(textoOrcamento()), '_blank', 'noopener');
-    else if (acao === 'cnpj') { e.preventDefault(); avisar('No site real, abre o cadastro de empresa. O preço de CNPJ aparece depois do login.'); }
+    else if (acao === 'conta') { e.preventDefault(); abrirConta('inicio'); }
+    else if (acao === 'cadastro') { e.preventDefault(); abrirConta('cadastro', alvo.dataset.tipo); }
+    else if (acao === 'conta-voltar') { telaConta = 'inicio'; desenharConta(); }
+    else if (acao === 'perfil') trocarPerfil(alvo.dataset.perfil);
     else if (acao === 'zap') { e.preventDefault(); avisar('No site real, este botão abre o WhatsApp da Mais Mendes.'); }
   });
   function fecharMega() {
@@ -631,6 +812,14 @@
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { fecharMega(); if ($('.gaveta.aberto')) fechar(); } });
   document.addEventListener('input', (e) => { if (e.target.name === 'cep') e.target.value = cepMascara(e.target.value); });
   document.addEventListener('submit', (e) => {
+    if (e.target.matches('[data-cadastro]')) {
+      e.preventDefault();
+      if (!e.target.reportValidity()) return;
+      telaConta = 'enviado';
+      desenharConta();
+      $('#gaveta-conta .gaveta-cab button').focus();
+      return;
+    }
     const f = e.target.closest('[data-cep]');
     if (!f) return;
     e.preventDefault();
@@ -642,14 +831,21 @@
     atualizar();
   });
   document.addEventListener('change', (e) => {
+    if (e.target.name === 'tipo' && e.target.closest('[data-cadastro]')) {
+      tipoCadastro = e.target.value;
+      desenharConta();
+      $(`#conta-corpo input[name="tipo"][value="${tipoCadastro}"]`).focus();
+      return;
+    }
     if (e.target.name !== 'frete') return;
     freteId = e.target.value;
     guardar('mm_frete', freteId);
     desenharOrcamento();
   });
-  // a logo vem do site atual do cliente; se não carregar, entra a versão em texto
+  // a logo vem do site atual do cliente; se não carregar, entra a versão em texto (o mesmo vale para as marcas)
   document.addEventListener('error', (e) => {
     if (e.target.matches && e.target.matches('img[data-logo]')) e.target.outerHTML = '<span class="logo-txt"><b>+</b>MENDES</span>';
+    if (e.target.matches && e.target.matches('img[data-marca]')) e.target.outerHTML = `<span class="marca-txt">${esc(e.target.alt)}</span>`;
   }, true);
 
   /* ---------- Início ---------- */
@@ -662,6 +858,13 @@
   if (pagina === 'categoria') paginaCategoria();
   if (pagina === 'produto') paginaProduto();
   atualizar();
+  try {
+    const novo = sessionStorage.getItem('mm_aviso_perfil');
+    if (novo) {
+      sessionStorage.removeItem('mm_aviso_perfil');
+      avisar(PERFIS[novo] ? `Pronto: você está vendo os preços de ${PERFIS[novo].nome}.` : 'Pronto: você está vendo o preço de vitrine.');
+    }
+  } catch (err) { /* ok */ }
   // Link direto do mapa da loja (sitemap.html): abre o orçamento já com um exemplo, se estiver vazio
   if (location.hash === '#orcamento') {
     if (!orc.length) {
@@ -671,4 +874,6 @@
     }
     abrir('gaveta-orc');
   }
+  // Também do mapa: abre "Minha conta" (perfis e cadastro de empresa ou profissional CREA-GO)
+  if (location.hash === '#conta') abrirConta('inicio');
 })();
