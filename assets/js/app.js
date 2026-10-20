@@ -51,12 +51,13 @@
     minus: '<path d="M5 12h14"/>',
     trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/>',
     check: '<path d="m5 12 5 5 9-10"/>',
+    estrela: '<path d="m12 2.5 2.9 6.1 6.6.8-4.9 4.6 1.3 6.6-5.9-3.3-5.9 3.3 1.3-6.6-4.9-4.6 6.6-.8z"/>',
     filter: '<path d="M4 5h16l-6 8v6l-4-2v-4z"/>',
     instagram: '<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6"/>',
     whatsapp: '<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>',
     facebook: '<path d="M14 21v-8h3l.5-3.5H14V7.5c0-1 .4-1.8 1.9-1.8h1.7V2.7c-.4-.1-1.4-.2-2.6-.2-2.6 0-4.4 1.6-4.4 4.5v2.5H7.5V13h3.1v8"/>',
   };
-  const PREENCHIDOS = ['whatsapp'];
+  const PREENCHIDOS = ['whatsapp', 'estrela'];
   const ico = (nome, tam = 24, classe = '') =>
     `<svg class="ico ${PREENCHIDOS.includes(nome) ? 'ico-cheio ' : ''}${classe}" width="${tam}" height="${tam}" viewBox="0 0 24 24" aria-hidden="true">${ICONES[nome] || ''}</svg>`;
 
@@ -694,6 +695,7 @@
     }).join('');
     $('#marcas').innerHTML = `<ul class="marcas-faixa">${logos}</ul><ul class="marcas-faixa" aria-hidden="true">${logos.replace(/<a /g, '<a tabindex="-1" ')}</ul>`;
     carrossel();
+    depoimentos();
     $('#news').addEventListener('submit', (e) => {
       e.preventDefault();
       e.target.outerHTML = '<p class="news-ok">Pronto! Você vai receber nossas ofertas por e-mail.</p>';
@@ -720,6 +722,51 @@
     ['pointerleave', 'focusout'].forEach((ev) => $('.hero').addEventListener(ev, () => { pausado = window.matchMedia('(prefers-reduced-motion: reduce)').matches; }));
     setInterval(() => { if (!pausado && !document.hidden) ir(atual() + 1); }, 6000);
     marcar();
+  }
+
+  /* Depoimentos: mesmos campos do bloco "Depoimento" do Ipanema (foto, nome, estrelas, título e citação), em carrossel
+     de até 3 colunas com paginação. Sem foto, entram as iniciais. Textos de exemplo até o cliente enviar avaliações reais. */
+  const DEPOIMENTOS = [
+    ['Rodrigo A.', 'Eletricista', 5, 'Chegou no mesmo dia', 'Fiz o pedido de manhã e à tarde o material estava na obra. Veio tudo conferido, sem faltar nada.'],
+    ['Fernanda L.', 'Engenheira civil', 5, 'Atendimento de quem entende', 'Tirei a dúvida da bitola do cabo pelo WhatsApp antes de comprar. Me indicaram o certo, sem empurrar o mais caro.'],
+    ['Paulo R.', 'Mestre de obras', 5, 'Orçamento sem enrolação', 'Montei a lista no site, vi o frete na hora e fechei. Não precisei esperar ninguém me retornar.'],
+    ['Marina S.', 'Compras · construtora', 5, 'Facilita a compra da empresa', 'Compramos com o CNPJ da construtora e a nota vem certinha. Ajuda muito no controle de cada obra.'],
+    ['João V.', 'Reforma em casa', 4, 'Tudo num pedido só', 'Elétrica, hidráulica e ferramenta no mesmo carrinho. Economizei tempo e um frete.'],
+    ['Luciana M.', 'Arquiteta', 5, 'Retirada rápida na loja', 'Comprei pelo site e retirei no Setor Capuava. Quando cheguei, o pedido já estava separado.'],
+  ];
+  function depoimentos() {
+    const trilho = $('#depoimentos'), pontos = $('#depo-pontos');
+    const iniciais = (n) => n.split(/\s+/).map((x) => x[0]).join('').slice(0, 2).toUpperCase();
+    trilho.innerHTML = DEPOIMENTOS.map(([nome, quem, nota, titulo, texto], i) => `<figure class="depo" aria-roledescription="depoimento" aria-label="${i + 1} de ${DEPOIMENTOS.length}">
+        <div class="depo-cab">
+          <span class="depo-foto" aria-hidden="true">${iniciais(nome)}</span>
+          <div>
+            <span class="depo-estrelas" role="img" aria-label="${nota} de 5 estrelas">${[1, 2, 3, 4, 5].map((n) => ico('estrela', 14, n <= nota ? '' : 'apagada')).join('')}</span>
+            <figcaption><strong>${esc(nome)}</strong> · ${esc(quem)}</figcaption>
+          </div>
+        </div>
+        <h3>${esc(titulo)}</h3>
+        <blockquote>“${esc(texto)}”</blockquote>
+      </figure>`).join('');
+    // paginação: uma bolinha por "página" (3 depoimentos no desktop, 2 no tablet, 1 no celular)
+    const porTela = () => Math.max(1, Math.round(trilho.clientWidth / trilho.firstElementChild.getBoundingClientRect().width));
+    const paginas = () => Math.ceil(DEPOIMENTOS.length / porTela());
+    const passo = () => trilho.children[1].offsetLeft - trilho.children[0].offsetLeft;
+    const atual = () => Math.min(paginas() - 1, Math.round(trilho.scrollLeft / (passo() * porTela())));
+    const desenharPontos = () => {
+      const n = paginas();
+      pontos.hidden = n < 2;
+      pontos.innerHTML = Array.from({ length: n }, (_, i) => `<button data-depo="${i}" aria-label="Ver depoimentos, página ${i + 1} de ${n}"></button>`).join('');
+      marcar();
+    };
+    const marcar = () => $$('button', pontos).forEach((b, i) => b.setAttribute('aria-current', i === atual()));
+    pontos.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-depo]');
+      if (b) trilho.scrollTo({ left: Number(b.dataset.depo) * porTela() * passo(), behavior: 'smooth' });
+    });
+    trilho.addEventListener('scroll', () => requestAnimationFrame(marcar), { passive: true });
+    window.addEventListener('resize', desenharPontos);
+    desenharPontos();
   }
 
   function paginaCategoria() {

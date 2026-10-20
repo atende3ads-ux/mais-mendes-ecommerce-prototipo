@@ -7,7 +7,7 @@ Protótipo navegável do e-commerce da Mais Mendes Distribuidora, usado para val
 
 ## O que dá para testar
 
-- **Home** na estrutura do Ipanema: banner rotativo (4 opções), categorias com foto, como funciona, marcas parceiras em faixa contínua, listas de produtos, cadastro para CNPJ e newsletter.
+- **Home** na estrutura do Ipanema: banner rotativo (4 opções), categorias com foto, como funciona, marcas parceiras em faixa contínua, listas de produtos, cadastro para CNPJ, depoimentos (seção nativa do Ipanema) e newsletter.
 - **Categoria e busca** (`categoria.html`): filtro por subcategoria e marca, ordenação, adicionar com quantidade direto no card.
 - **Produto** (`produto.html`): variações com preço por opção, tag de desconto, quantidade, cálculo de frete e prazo por CEP.
 - **Meu orçamento**: lista lateral com total, quanto falta para a entrega grátis, frete e prazo, e a barra fixa que acompanha a navegação.
@@ -24,6 +24,7 @@ Protótipo navegável do e-commerce da Mais Mendes Distribuidora, usado para val
 - **Frete e prazo:** seguem a política de frete do cliente (13/10/2026), com valores simulados para transportadora. Grande Goiânia = CEPs 74xxx, Senador Canedo e Trindade, até o cliente confirmar as cidades atendidas.
 - **Fotos de produto:** todas em fundo branco e sem marca d'água. 15 produtos usam a foto real, recortada das artes do próprio cliente; os outros usam imagens de licença livre que mostram o tipo de produto, não a marca exata. Fontes em [CREDITOS.md](CREDITOS.md).
 - **Textos e fotos dos banners.**
+- **Depoimentos:** textos e nomes de exemplo, só para mostrar a seção. Na loja, entram avaliações reais de clientes, com autorização.
 
 ## Estrutura
 
