@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Fale conosco e nossa loja | Mais Mendes</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="assets/css/style.css?v=20261029a">
+</head>
+<body data-pagina="contato">
+  <div id="cabecalho"></div>
+
+  <!-- Contato (página nativa da Nuvemshop, com formulário) + endereço e mapa da loja.
+       "Trabalhe conosco" é uma opção de assunto do formulário (contato.html?assunto=trabalhe). -->
+  <main id="conteudo">
+    <section class="pag-hero">
+      <div class="pag-hero-foto" style="background-image:url('assets/img/empresa/showroom.jpg');background-position:60% 50%"></div>
+      <div class="container">
+        <nav class="trilha" aria-label="Você está em"><a href="index.html">Início</a><i data-ico="right" data-tam="14"></i><span>Fale conosco</span></nav>
+        <span class="tag"><span>Atendimento de quem entende de obra</span></span>
+        <h1>Fale com a <em>Mais Mendes</em></h1>
+        <p>Dúvida técnica, orçamento para empresa, crítica ou sugestão. Escolha o canal que preferir.</p>
+      </div>
+    </section>
+
+    <div class="container">
+      <div class="canais">
+        <a class="canal canal-zap" href="#" data-acao="zap"><span class="cartao-ico"><i data-ico="whatsapp" data-tam="22"></i></span>
+          <span><strong>WhatsApp</strong><b>Chamar agora</b>Resposta em horário comercial</span></a>
+        <a class="canal" href="tel:40031960"><span class="cartao-ico"><i data-ico="phone" data-tam="22"></i></span>
+          <span><strong>Telefone</strong><b>4003-1960</b><span class="confirmar" title="Confirmar com o cliente: telefone oficial da loja">a confirmar</span></span></a>
+        <a class="canal" href="mailto:comercial@maismendesdistribuidora.com.br"><span class="cartao-ico"><i data-ico="mail" data-tam="22"></i></span>
+          <span><strong>E-mail</strong><b>comercial@<wbr>maismendesdistribuidora.com.br</b></span></a>
+        <a class="canal" href="#loja"><span class="cartao-ico"><i data-ico="store" data-tam="22"></i></span>
+          <span><strong>Loja</strong><b>Setor Capuava, Goiânia</b>Retirada grátis dos pedidos</span></a>
+      </div>
+    </div>
+
+    <section class="secao secao-g" id="formulario">
+      <div class="container contato-grade">
+        <div class="form-caixa">
+          <h2>Envie sua mensagem</h2>
+          <p>Respondemos por e-mail ou WhatsApp em até 1 dia útil.</p>
+          <form class="form" data-simular="contato-ok">
+            <div class="campo campo-cheio">
+              <label for="assunto">Assunto</label>
+              <select id="assunto" name="assunto" required>
+                <option value="duvida">Dúvida sobre um produto ou pedido</option>
+                <option value="empresa">Orçamento para empresa (CNPJ)</option>
+                <option value="critica">Crítica ou sugestão</option>
+                <option value="trabalhe">Trabalhe conosco</option>
+              </select>
+            </div>
+            <div class="campo"><label for="nome">Nome</label><input id="nome" name="nome" autocomplete="name" required></div>
+            <div class="campo"><label for="tel">WhatsApp ou telefone</label><input id="tel" name="tel" type="tel" autocomplete="tel" inputmode="tel" required></div>
+            <div class="campo campo-cheio"><label for="email">E-mail</label><input id="email" name="email" type="email" autocomplete="email" required></div>
+            <div class="campo" data-so-trabalhe hidden>
+              <label for="area">Área de interesse</label>
+              <select id="area" name="area">
+                <option>Vendas e atendimento</option><option>Estoque e expedição</option><option>Entregas</option><option>Administrativo</option><option>Outra</option>
+              </select>
+            </div>
+            <div class="campo" data-so-trabalhe hidden>
+              <label for="cv">Currículo <small>(PDF, opcional)</small></label>
+              <input id="cv" name="cv" type="file" accept=".pdf,.doc,.docx">
+            </div>
+            <div class="campo campo-cheio"><label for="msg">Mensagem</label><textarea id="msg" name="msg" required placeholder="Conte como podemos ajudar. Se for sobre um pedido, informe o número."></textarea></div>
+            <div class="form-pe">
+              <button class="btn btn-primario">Enviar mensagem</button>
+              <p>Usamos seus dados só para responder a este contato. Veja a <a href="privacidade.html" style="text-decoration:underline">política de privacidade</a>.</p>
+            </div>
+          </form>
+          <template id="contato-ok">
+            <div class="form-ok" role="status">
+              <i data-ico="check" data-tam="40"></i>
+              <strong>Mensagem enviada</strong>
+              <p>Obrigado! Nossa equipe responde em até 1 dia útil. Se for urgente, chame no WhatsApp.</p>
+              <a class="btn btn-escuro btn-p" href="categoria.html">Voltar para a loja</a>
+            </div>
+          </template>
+        </div>
+
+        <div class="loja-info" id="loja">
+          <h2 class="sec-titulo">Nossa loja</h2>
+          <iframe class="mapa" title="Mapa: Mais Mendes no Setor Capuava, Goiânia" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps/embed?origin=mfe&amp;pb=!1m2!2m1!1sRua+Ant%C3%B4nio+Carlos,+Setor+Capuava,+Goi%C3%A2nia+-+GO,+74450-360"></iframe>
+          <p><strong style="color:var(--preto)">Rua Antônio Carlos, Qd. 82, Lt. 12, nº <span class="confirmar" title="Confirmar com o cliente: nº 305 no site atual e nº 275 no cartão CNPJ">305</span></strong><br>Setor Capuava · Goiânia/GO · CEP 74450-360</p>
+          <dl class="horarios">
+            <div><dt>Segunda a sexta</dt><dd><span class="confirmar" title="Horário sugerido no documento de políticas, a confirmar">8h às 18h</span></dd></div>
+            <div><dt>Sábado</dt><dd><span class="confirmar" title="Horário a confirmar com o cliente">a confirmar</span></dd></div>
+            <div><dt>Retirada de pedidos</dt><dd>Avisamos quando estiver separado</dd></div>
+          </dl>
+          <div class="hero-botoes">
+            <a class="btn btn-escuro" href="https://www.google.com/maps/dir/?api=1&destination=Rua+Ant%C3%B4nio+Carlos,+Setor+Capuava,+Goi%C3%A2nia+-+GO" target="_blank" rel="noopener"><i data-ico="pin" data-tam="20"></i> Como chegar</a>
+            <a class="btn btn-linha" href="frete.html#retirada">Retirar na loja</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="secao secao-cinza secao-m" aria-label="Atalhos de ajuda">
+      <div class="container">
+        <div class="sec-cab"><div><h2 class="sec-titulo">Talvez a resposta já esteja aqui</h2></div></div>
+        <div class="cartoes" style="--col:3">
+          <a class="cartao" href="frete.html"><span class="cartao-ico"><i data-ico="truck" data-tam="26"></i></span>
+            <h3>Frete e prazo</h3><p>Entrega em até 24h na Grande Goiânia e grátis a partir de R$ 200.</p></a>
+          <a class="cartao" href="trocas.html"><span class="cartao-ico"><i data-ico="shield" data-tam="26"></i></span>
+            <h3>Trocas e devoluções</h3><p>7 dias para desistir e 30 dias para trocar sobra de obra lacrada.</p></a>
+          <a class="cartao" href="empresas.html"><span class="cartao-ico"><i data-ico="building" data-tam="26"></i></span>
+            <h3>Compras com CNPJ</h3><p>Preço de empresa, nota fiscal e frete grátis a partir de R$ 1.000.</p></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape" id="rodape"></footer>
+
+  <script src="assets/js/data.js?v=20261029a"></script>
+  <script src="assets/js/app.js?v=20261029a"></script>
+</body>
+</html>

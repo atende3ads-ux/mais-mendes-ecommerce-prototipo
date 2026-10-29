@@ -7,6 +7,7 @@ Todas as fotos de produto foram padronizadas: fundo removido, produto centraliza
 ## Do próprio cliente (Mais Mendes)
 
 - Logos (`assets/img/logo-*.png`) e foto do banner de atendimento (`banners/hero-atendente.jpg`, 1600 × 1067 px): site atual do cliente.
+- Fotos da empresa (`assets/img/empresa/`: fachada, loja, estoque), usadas nas páginas institucionais: pasta "empresa" no Drive do cliente (enviada em 29/10/2026), redimensionadas para no máximo 1600 px.
 - Produtos recortados das artes da pasta "Portfólio" no Drive do cliente (15): `adesivo-krona`, `argamassa-precon`, `cabo-lamesa`, `cabo-luxpremium`, `chave-reversora-sibratec`, `contator-tramontina`, `interruptor-onne-smart`, `lampada-lumanti`, `manta-viapol`, `painel-led-blumenau`, `parafusadeira-stanley`, `perfil-led-lumanti`, `primer-viapol`, `tomada-pluzie`, `tubo-esgoto`.
 
 ## Unsplash (Licença Unsplash — uso livre)

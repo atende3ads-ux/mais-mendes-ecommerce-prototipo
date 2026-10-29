@@ -253,9 +253,10 @@
     </div></div>
     <div class="topo"><div class="container">
       <ul>
-        <li><a href="#">Clube Mais Mendes</a></li>
-        <li><a href="#">Venda para empresas (CNPJ)</a></li>
-        <li><a href="#">Nossa história</a></li>
+        <li><a href="clube.html">Clube Mais Mendes</a></li>
+        <li><a href="empresas.html">Venda para empresas (CNPJ)</a></li>
+        <li><a href="historia.html">Nossa história</a></li>
+        <li><a href="blog.html">Blog</a></li>
       </ul>
       <ul>
         <li><a href="tel:${FONE.replace(/\D/g, '')}">${ico('phone', 16)} ${FONE}</a></li>
@@ -288,7 +289,7 @@
           </li>
           ${cats}
         </ul>
-        <div class="nav-apoio"><a href="#">Ajuda</a><a href="#">Nossa loja</a><a href="#">Fale conosco</a></div>
+        <div class="nav-apoio"><a href="duvidas.html">Ajuda</a><a href="contato.html#loja">Nossa loja</a><a href="contato.html">Fale conosco</a></div>
       </div></nav>
     </header>
     <div class="info"><div class="container"><ul>
@@ -312,15 +313,19 @@
         </div>
         <div><h3>Categorias</h3><ul>${CATS.map((c) => `<li><a href="${urlCat(c)}">${c.nome}</a></li>`).join('')}</ul></div>
         <div><h3>Ajuda</h3><ul>
-          <li><a href="#">Como comprar</a></li>
-          <li><a href="#">Frete e prazo de entrega</a></li>
-          <li><a href="#">Trocas e devoluções</a></li>
-          <li><a href="#">Dúvidas frequentes</a></li>
-          <li><a href="#">Política de privacidade</a></li>
-          <li><a href="#">Nossa história</a></li>
-          <li><a href="#">Clube Mais Mendes</a></li>
-          <li><a href="#">Blog</a></li>
-          <li><a href="#">Trabalhe conosco</a></li>
+          <li><a href="duvidas.html#como-comprar">Como comprar</a></li>
+          <li><a href="frete.html">Frete e prazo de entrega</a></li>
+          <li><a href="trocas.html">Trocas e devoluções</a></li>
+          <li><a href="duvidas.html">Dúvidas frequentes</a></li>
+          <li><a href="privacidade.html">Política de privacidade</a></li>
+        </ul>
+        <h3 class="rodape-h3-2">Mais Mendes</h3><ul>
+          <li><a href="historia.html">Nossa história</a></li>
+          <li><a href="empresas.html">Para empresas (CNPJ)</a></li>
+          <li><a href="clube.html">Clube Mais Mendes</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="contato.html">Fale conosco</a></li>
+          <li><a href="contato.html?assunto=trabalhe#formulario">Trabalhe conosco</a></li>
         </ul></div>
         <div><h3>Atendimento</h3><ul class="rodape-contato">
           <li>${ico('phone', 18)}<span>${FONE}</span></li>
@@ -348,7 +353,7 @@
       <div class="gaveta-cab"><h2>Categorias</h2><button data-acao="fechar" aria-label="Fechar">${ico('x')}</button></div>
       <div class="gaveta-corpo">
         ${CATS.map((c) => `<div class="menu-cat"><a href="${urlCat(c)}">${ico(c.icone, 22)} ${c.nome}</a></div>`).join('')}
-        <div class="menu-apoio"><a href="#">Minha conta</a><a href="#">Ajuda</a><a href="#">Nossa loja</a><a href="#">Clube Mais Mendes</a></div>
+        <div class="menu-apoio"><a href="#">Minha conta</a><a href="empresas.html">Para empresas (CNPJ)</a><a href="clube.html">Clube Mais Mendes</a><a href="historia.html">Nossa história</a><a href="blog.html">Blog</a><a href="duvidas.html">Ajuda</a><a href="contato.html">Fale conosco e nossa loja</a></div>
       </div>
     </aside>
     <div class="barra" id="barra" role="status">
@@ -711,6 +716,72 @@
     });
   }
 
+
+  /* ---------- Páginas institucionais e de ajuda ---------- */
+  const AJUDA = [
+    ['duvidas.html', 'chat', 'Dúvidas frequentes'],
+    ['frete.html', 'truck', 'Frete e prazo de entrega'],
+    ['trocas.html', 'shield', 'Trocas e devoluções'],
+    ['privacidade.html', 'user', 'Política de privacidade'],
+    ['contato.html', 'mail', 'Fale conosco'],
+  ];
+  const arquivo = () => location.pathname.split('/').pop() || 'index.html';
+
+  function paginasInstitucionais() {
+    // ícones escritos no HTML como <i data-ico="nome" data-tam="24"></i>
+    const icones = (raiz) => $$('[data-ico]', raiz).forEach((el) => { el.outerHTML = ico(el.dataset.ico, Number(el.dataset.tam) || 24, el.className); });
+    icones(document);
+    // vitrines de produto dentro do texto: <div data-produtos="slug,slug"></div>
+    $$('[data-produtos]').forEach((el) => { el.innerHTML = el.dataset.produtos.split(',').map(produto).filter(Boolean).map((p) => card(p)).join(''); });
+
+    // tabelas: o nome da coluna vai em cada célula, para empilhar as linhas no celular
+    $$('.tabela').forEach((t) => {
+      const cols = $$('thead th', t).map((th) => th.textContent);
+      $$('tbody tr', t).forEach((tr) => [...tr.children].forEach((c, i) => c.setAttribute('data-col', cols[i] || '')));
+    });
+
+    const nav = $('#ajuda-nav');
+    if (nav) {
+      nav.innerHTML = `<h2>Central de ajuda</h2>
+        <nav aria-label="Central de ajuda">${AJUDA.map(([href, i, nome]) => `<a href="${href}" ${href === arquivo() ? 'aria-current="page"' : ''}>${ico(i, 20)} ${nome}</a>`).join('')}</nav>
+        <div class="ajuda-contato"><strong>Não achou a resposta?</strong>Fale com quem entende de obra. Respondemos em horário comercial.
+          <a class="btn btn-escuro btn-p" href="#" data-acao="zap">${ico('whatsapp', 18)} Chamar no WhatsApp</a></div>`;
+      const atual = $('a[aria-current]', nav); // no celular o menu vira uma faixa com rolagem: começa na página atual
+      if (atual) { const faixa = atual.parentElement; faixa.scrollLeft += atual.getBoundingClientRect().left - faixa.getBoundingClientRect().left - 16; }
+    }
+
+    // Formulários simulados: validação do navegador e, ao enviar, a mensagem de confirmação do próprio HTML (<template>)
+    $$('form[data-simular]').forEach((f) => f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const ok = $('#' + f.dataset.simular).content.cloneNode(true);
+      icones(ok);
+      const caixa = f.parentElement;
+      f.replaceWith(ok);
+      if (caixa.matches('.form-caixa')) caixa.scrollIntoView({ block: 'start' });
+    }));
+
+    // Contato: "Trabalhe conosco" mostra os campos de vaga e currículo; ?assunto=trabalhe já chega selecionado
+    const assunto = $('#assunto');
+    if (assunto) {
+      const mostrar = () => $$('[data-so-trabalhe]').forEach((el) => {
+        el.hidden = assunto.value !== 'trabalhe';
+        $$('input, select', el).forEach((c) => { c.disabled = el.hidden; });
+      });
+      if (params.get('assunto')) assunto.value = params.get('assunto');
+      assunto.addEventListener('change', mostrar);
+      mostrar();
+    }
+
+    // Blog: filtro por tema
+    const chips = $('#temas');
+    if (chips) chips.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      $$('button', chips).forEach((x) => x.setAttribute('aria-pressed', x === b));
+      $$('.post[data-tema]').forEach((p) => { p.hidden = b.dataset.tema !== 'todos' && p.dataset.tema !== b.dataset.tema; });
+    });
+  }
+
   /* ---------- Eventos ---------- */
   document.addEventListener('click', (e) => {
     const alvo = e.target.closest('[data-acao]');
@@ -732,7 +803,7 @@
     else if (acao === 'fechar-aviso') { $('#aviso').remove(); try { sessionStorage.setItem('mm_aviso', '1'); } catch (err) { /* ok */ } }
     else if (acao === 'finalizar') avisar('No site real, aqui você segue para o pagamento (checkout da Nuvemshop).');
     else if (acao === 'enviar-zap') window.open('https://wa.me/?text=' + encodeURIComponent(textoOrcamento()), '_blank', 'noopener');
-    else if (acao === 'cnpj') { e.preventDefault(); avisar('No site real, abre o cadastro de empresa. O preço de CNPJ aparece depois do login.'); }
+    else if (acao === 'cnpj') { e.preventDefault(); location.href = 'empresas.html#cadastro'; }
     else if (acao === 'zap') { e.preventDefault(); avisar('No site real, este botão abre o WhatsApp da Mais Mendes.'); }
   });
   function fecharMega() {
@@ -772,6 +843,7 @@
   if (pagina === 'home') paginaHome();
   if (pagina === 'categoria') paginaCategoria();
   if (pagina === 'produto') paginaProduto();
+  paginasInstitucionais();
   atualizar();
   // Link direto do mapa da loja (sitemap.html): abre o orçamento já com um exemplo, se estiver vazio
   if (location.hash === '#orcamento') {
