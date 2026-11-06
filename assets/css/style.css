@@ -815,7 +815,7 @@ a.canal:hover { border-color: var(--preto); }
   .pag-hero::before { background: linear-gradient(180deg, rgba(26,26,26,0) 0%, rgba(26,26,26,.2) 30%, var(--preto) 56%); }
   .pag-hero .container { min-height: 420px; justify-content: flex-end; padding-bottom: 40px; }
   .pag-hero-sem-foto .container { min-height: 0; padding-top: 20px; padding-bottom: 32px; }
-  .pag-hero-sem-foto::after { width: 120px; height: 40%; top: 0; bottom: auto; right: -24px; }
+  .pag-hero-sem-foto::after { width: 110px; height: 44px; top: 0; bottom: auto; right: -24px; }
   .pag-hero p { font-size: 16px; }
   .dupla { grid-template-columns: 1fr; gap: 28px; }
   .dupla-inv > :first-child { order: 0; }
