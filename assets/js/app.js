@@ -325,7 +325,7 @@
           <li><a href="clube.html">Clube Mais Mendes</a></li>
           <li><a href="blog.html">Blog</a></li>
           <li><a href="contato.html">Fale conosco</a></li>
-          <li><a href="contato.html?assunto=trabalhe#formulario">Trabalhe conosco</a></li>
+          <li><a href="trabalhe.html">Trabalhe conosco</a></li>
         </ul></div>
         <div><h3>Atendimento</h3><ul class="rodape-contato">
           <li>${ico('phone', 18)}<span>${FONE}</span></li>
@@ -760,17 +760,25 @@
       if (caixa.matches('.form-caixa')) caixa.scrollIntoView({ block: 'start' });
     }));
 
-    // Contato: "Trabalhe conosco" mostra os campos de vaga e currículo; ?assunto=trabalhe já chega selecionado
-    const assunto = $('#assunto');
-    if (assunto) {
-      const mostrar = () => $$('[data-so-trabalhe]').forEach((el) => {
-        el.hidden = assunto.value !== 'trabalhe';
-        $$('input, select', el).forEach((c) => { c.disabled = el.hidden; });
-      });
-      if (params.get('assunto')) assunto.value = params.get('assunto');
-      assunto.addEventListener('change', mostrar);
-      mostrar();
-    }
+    // Campos condicionais: data-mostrar-se="campo=valor" só aparece (e só é obrigatório) com aquele valor escolhido
+    $$('[data-mostrar-se]').forEach((el) => {
+      const [nome, valor] = el.dataset.mostrarSe.split('=');
+      const form = el.closest('form');
+      const atualizarCampo = () => {
+        el.hidden = !form || form.elements[nome]?.value !== valor;
+        $$('input, select, textarea', el).forEach((c) => { c.disabled = el.hidden; });
+      };
+      if (form) form.addEventListener('change', atualizarCampo);
+      atualizarCampo();
+    });
+    // Botões de vaga: data-preencher="campo=valor" já escolhe a área no formulário de candidatura
+    document.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-preencher]');
+      if (!b) return;
+      const [nome, valor] = b.dataset.preencher.split('=');
+      const campo = $(`form [name="${nome}"]`);
+      if (campo) { campo.value = valor; campo.dispatchEvent(new Event('change', { bubbles: true })); }
+    });
 
     // Blog: filtro por tema
     const chips = $('#temas');
