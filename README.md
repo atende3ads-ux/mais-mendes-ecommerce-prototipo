@@ -11,7 +11,7 @@ Protótipo navegável do e-commerce da Mais Mendes Distribuidora, usado para val
 - **Categoria e busca** (`categoria.html`): filtro por subcategoria e marca, ordenação, adicionar com quantidade direto no card.
 - **Produto** (`produto.html`): variações com preço por opção, tag de desconto, quantidade, cálculo de frete e prazo por CEP.
 - **Meu orçamento**: lista lateral com total, quanto falta para a entrega grátis, frete e prazo, e a barra fixa que acompanha a navegação.
-- **Institucionais**: Nossa história (`historia.html`), Fale conosco e nossa loja (`contato.html`), Trabalhe conosco com vagas e banco de talentos (`trabalhe.html`), Para empresas com cadastro de CNPJ e cupom CREA-GO (`empresas.html`), Clube Mais Mendes (`clube.html`) e Blog com modelo de artigo (`blog.html`, `artigo.html`).
+- **Institucionais**: Nossa história (`historia.html`), Fale conosco e nossa loja (`contato.html`), Trabalhe conosco com banco de talentos (`trabalhe.html`), Para empresas com cadastro de CNPJ e cupom CREA-GO (`empresas.html`), Clube Mais Mendes (`clube.html`) e Blog com modelo de artigo (`blog.html`, `artigo.html`).
 - **Central de ajuda**: Dúvidas frequentes, Frete e prazo, Trocas e devoluções e Política de privacidade (`duvidas.html`, `frete.html`, `trocas.html`, `privacidade.html`), com o texto das políticas do cliente de 13/10/2026.
 
 ## O que é ilustrativo
@@ -23,7 +23,6 @@ Protótipo navegável do e-commerce da Mais Mendes Distribuidora, usado para val
 - **Fotos de produto:** todas em fundo branco e sem marca d'água. 15 produtos usam a foto real, recortada das artes do próprio cliente; os outros usam imagens de licença livre que mostram o tipo de produto, não a marca exata. Fontes em [CREDITOS.md](CREDITOS.md).
 - **Textos e fotos dos banners.**
 - **Valores a confirmar:** nas páginas institucionais e de ajuda, o que estava entre colchetes no documento de políticas (taxas, prazos, horário, WhatsApp, número do endereço) aparece com fundo amarelo e sublinhado tracejado; passe o mouse para ver o motivo.
-- **Vagas e benefícios** em Trabalhe conosco: as vagas são exemplos e os benefícios aguardam o cliente.
 - **Formulários** (contato, currículo, cadastro de empresa, cupom CREA-GO): só simulam o envio. A política de privacidade é um modelo e o artigo do blog tem texto de exemplo.
 - **Depoimentos:** textos e nomes de exemplo, só para mostrar a seção. Na loja, entram avaliações reais de clientes, com autorização.
 
